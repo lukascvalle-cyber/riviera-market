@@ -7,11 +7,11 @@ import { CartDrawer } from '../../components/order/CartDrawer'
 import { useVendorLocation } from '../../hooks/useVendorLocation'
 import { useCart } from '../../contexts/CartContext'
 import type { VendorWithLocation } from '../../types'
-import mapboxgl from 'mapbox-gl'
+import type { Map as MapboxMap } from 'mapbox-gl'
 
 export function MapView() {
   const mapRef = useRef<BeachMapHandle>(null)
-  const [map, setMap] = useState<mapboxgl.Map | null>(null)
+  const [map, setMap] = useState<MapboxMap | null>(null)
   const [selectedVendor, setSelectedVendor] = useState<VendorWithLocation | null>(null)
   const [cartOpen, setCartOpen] = useState(false)
   const { vendors, loading } = useVendorLocation()

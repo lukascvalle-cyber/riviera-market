@@ -7,7 +7,6 @@ import { supabase } from '../../lib/supabase'
 import { useToast } from '../../components/ui/Toast'
 import { Input } from '../../components/ui/Input'
 import { Button } from '../../components/ui/Button'
-import type { UserRole } from '../../types'
 
 const schema = z.object({
   full_name: z.string().min(2, 'Nome muito curto'),

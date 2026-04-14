@@ -5,11 +5,11 @@ import { MapLegend } from '../../components/map/MapLegend'
 import { useVendorLocation } from '../../hooks/useVendorLocation'
 import { supabase } from '../../lib/supabase'
 import type { VendorWithLocation } from '../../types'
-import mapboxgl from 'mapbox-gl'
+import type { Map as MapboxMap } from 'mapbox-gl'
 
 export function AdminMapPage() {
   const mapRef = useRef<BeachMapHandle>(null)
-  const [map, setMap] = useState<mapboxgl.Map | null>(null)
+  const [map, setMap] = useState<MapboxMap | null>(null)
   const [allVendors, setAllVendors] = useState<VendorWithLocation[]>([])
   const { vendors: activeVendors } = useVendorLocation()
 

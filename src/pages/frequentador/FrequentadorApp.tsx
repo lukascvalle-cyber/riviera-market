@@ -7,7 +7,7 @@ const NAV = [
 ]
 
 export function FrequentadorApp() {
-  const { signOut, profile } = useAuth()
+  const { signOut } = useAuth()
 
   return (
     <div className="flex flex-col h-screen">
