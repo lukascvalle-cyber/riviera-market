@@ -17,7 +17,6 @@ type FormValues = z.infer<typeof schema>
 export function LoginPage() {
   const navigate = useNavigate()
   const { refreshProfile } = useAuth()
-  const toast = useToast()
   const [error, setError] = useState<string | null>(null)
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
