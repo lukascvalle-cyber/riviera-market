@@ -35,15 +35,6 @@ interface FileState {
   name: string
 }
 
-/* ── Upload helper ── */
-async function uploadFile(file: File, folder: string, field: string): Promise<string | null> {
-  const ext = file.name.split('.').pop() ?? 'bin'
-  const path = `${folder}/${field}.${ext}`
-  const { error } = await supabase.storage.from('vendor-docs').upload(path, file, { upsert: true })
-  if (error) return null
-  const { data } = supabase.storage.from('vendor-docs').getPublicUrl(path)
-  return data.publicUrl
-}
 
 /* ── Section header component ── */
 function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
