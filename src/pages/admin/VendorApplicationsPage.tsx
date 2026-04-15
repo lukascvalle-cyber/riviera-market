@@ -7,13 +7,6 @@ import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
 import type { VendorApplication, VendorApplicationStatus } from '../../types'
 
-/* ── Tab config ── */
-const TABS: { key: VendorApplicationStatus | 'all'; label: string }[] = [
-  { key: 'pending', label: '' },
-  { key: 'approved', label: '' },
-  { key: 'rejected', label: '' },
-]
-
 const STATUS_BADGE: Record<VendorApplicationStatus, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   approved: 'bg-green-100 text-green-800',
