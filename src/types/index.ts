@@ -112,20 +112,14 @@ export type VendorType = 'ambulante' | 'barraca_fixa'
 
 export interface VendorApplication {
   id: string
-  applicant_profile_id: string | null
+  auth_user_id: string | null
   full_name: string
   email: string
   cpf: string
   phone: string
-  profile_photo_url: string | null
   vendor_type: VendorType
-  modules: number[]
-  products_description: string
-  authorization_doc_url: string | null
-  identity_doc_url: string | null
+  modules: string[]
+  product_description: string
   status: VendorApplicationStatus
-  rejection_reason: string | null
-  reviewed_at: string | null
   created_at: string
-  updated_at: string
 }

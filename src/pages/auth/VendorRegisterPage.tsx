@@ -157,7 +157,7 @@ export function VendorRegisterPage() {
     setGlobalError(null)
 
     try {
-      // 1. Create auth account (trigger creates profile + vendor row)
+      // 1. Create auth account (trigger creates profile row)
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: values.email,
         password: values.password,
@@ -166,28 +166,17 @@ export function VendorRegisterPage() {
       if (signUpError) { setGlobalError(signUpError.message); setSubmitting(false); return }
 
       const userId = authData.user?.id
-      const folder = userId ?? `anon-${Date.now()}`
 
-      // 2. Upload files
-      const [profilePhotoUrl, authDocUrl, idDocUrl] = await Promise.all([
-        profilePhoto ? uploadFile(profilePhoto.file, folder, 'profile') : Promise.resolve(null),
-        authDoc ? uploadFile(authDoc.file, folder, 'auth-doc') : Promise.resolve(null),
-        idDoc ? uploadFile(idDoc.file, folder, 'id-doc') : Promise.resolve(null),
-      ])
-
-      // 3. Insert vendor application
+      // 2. Insert vendor application — column names match the actual table schema
       const { error: appError } = await supabase.from('vendor_applications').insert({
-        applicant_profile_id: userId ?? null,
+        auth_user_id: userId ?? null,
         full_name: values.full_name,
         email: values.email,
         cpf: values.cpf,
         phone: values.phone,
-        profile_photo_url: profilePhotoUrl,
         vendor_type: values.vendor_type,
-        modules: values.modules,
-        products_description: values.products_description,
-        authorization_doc_url: authDocUrl,
-        identity_doc_url: idDocUrl,
+        modules: values.modules.map(String), // table stores text[]
+        product_description: values.products_description,
       })
 
       if (appError) { setGlobalError(t('vendorRegister.errorSubmit')); setSubmitting(false); return }

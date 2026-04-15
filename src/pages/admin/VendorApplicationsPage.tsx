@@ -163,7 +163,7 @@ function ApplicationCard({
             <div>
               <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.modules')}</p>
               <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">
-                {app.modules.sort((a, b) => a - b).join(', ')}
+                {app.modules.slice().sort((a, b) => Number(a) - Number(b)).join(', ')}
               </p>
             </div>
           </div>
@@ -173,28 +173,8 @@ function ApplicationCard({
             <p className="text-xs text-gray-400 font-body uppercase tracking-wide mb-1">
               {t('vendorRegister.productsDescription')}
             </p>
-            <p className="font-body text-sm text-gray-700 leading-relaxed">{app.products_description}</p>
+            <p className="font-body text-sm text-gray-700 leading-relaxed">{app.product_description}</p>
           </div>
-
-          {/* Documents */}
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.documents')}</p>
-            <div className="flex flex-wrap gap-3">
-              <DocLink url={app.profile_photo_url} label={t('vendorRegister.profilePhoto')} />
-              <DocLink url={app.authorization_doc_url} label={t('vendorRegister.authorizationDoc')} />
-              <DocLink url={app.identity_doc_url} label={t('vendorRegister.identityDoc')} />
-            </div>
-          </div>
-
-          {/* Rejection reason (if rejected) */}
-          {app.status === 'rejected' && app.rejection_reason && (
-            <div className="bg-red-50 rounded-xl p-3">
-              <p className="text-xs text-red-500 font-body uppercase tracking-wide mb-1">
-                {t('admin.rejectReason')}
-              </p>
-              <p className="text-sm text-red-800 font-body">{app.rejection_reason}</p>
-            </div>
-          )}
 
           {/* Actions */}
           {isPending && (
@@ -243,15 +223,23 @@ export function VendorApplicationsPage() {
     // 1. Mark application as approved
     const { error: appError } = await supabase
       .from('vendor_applications')
-      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .update({ status: 'approved' })
       .eq('id', app.id)
 
-    // 2. Approve vendor row if profile is linked
-    if (!appError && app.applicant_profile_id) {
+    // 2. Create (or update) vendor row so the vendor can log in and operate
+    if (!appError && app.auth_user_id) {
       await supabase
         .from('vendors')
-        .update({ is_approved: true })
-        .eq('profile_id', app.applicant_profile_id)
+        .upsert(
+          {
+            profile_id: app.auth_user_id,
+            display_name: app.full_name,
+            category: 'outros',
+            is_active: false,
+            is_approved: true,
+          },
+          { onConflict: 'profile_id' },
+        )
     }
 
     if (appError) {
@@ -259,7 +247,7 @@ export function VendorApplicationsPage() {
     } else {
       toast(t('admin.approveSuccess'), 'success')
       setApplications(prev =>
-        prev.map(a => a.id === app.id ? { ...a, status: 'approved', reviewed_at: new Date().toISOString() } : a),
+        prev.map(a => a.id === app.id ? { ...a, status: 'approved' } : a),
       )
     }
     setActionLoading(false)
@@ -269,7 +257,7 @@ export function VendorApplicationsPage() {
     setActionLoading(true)
     const { error } = await supabase
       .from('vendor_applications')
-      .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
+      .update({ status: 'rejected' })
       .eq('id', app.id)
 
     if (error) {
@@ -277,10 +265,7 @@ export function VendorApplicationsPage() {
     } else {
       toast(t('admin.rejectSuccess'), 'success')
       setApplications(prev =>
-        prev.map(a => a.id === app.id
-          ? { ...a, status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() }
-          : a,
-        ),
+        prev.map(a => a.id === app.id ? { ...a, status: 'rejected' } : a),
       )
     }
     setRejectTarget(null)

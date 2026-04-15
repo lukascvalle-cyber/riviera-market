@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .from('vendors')
           .select('*')
           .eq('profile_id', userId)
-          .single()
+          .maybeSingle()  // avoids 406 when vendor row doesn't exist yet
         setVendor(vendorData)
       }
     }
