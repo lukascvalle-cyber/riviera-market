@@ -1,4 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BeachMap, type BeachMapHandle } from '../../components/map/BeachMap'
 import { VendorPin } from '../../components/map/VendorPin'
 import { VendorPopup } from '../../components/map/VendorPopup'
@@ -16,6 +17,7 @@ export function MapView() {
   const [cartOpen, setCartOpen] = useState(false)
   const { vendors, loading } = useVendorLocation()
   const { itemCount } = useCart()
+  const { t } = useTranslation()
 
   // Once map mounts, get reference to the underlying mapboxgl.Map
   useEffect(() => {
@@ -47,13 +49,13 @@ export function MapView() {
 
       {loading && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 rounded-full px-4 py-2 text-sm font-body text-gray-600 shadow-md">
-          A carregar vendedores...
+          {t('map.loading')}
         </div>
       )}
 
       {!loading && activeVendors.length === 0 && (
         <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 rounded-full px-4 py-2 text-sm font-body text-gray-600 shadow-md">
-          Nenhum vendedor ativo no momento
+          {t('map.noActive')}
         </div>
       )}
 
@@ -67,7 +69,7 @@ export function MapView() {
       <button
         onClick={() => setCartOpen(true)}
         className="absolute top-4 right-4 bg-coral text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-coral-500 transition-colors"
-        aria-label="Ver carrinho"
+        aria-label={t('map.viewCart')}
       >
         <span className="text-xl">🛒</span>
         {itemCount > 0 && (

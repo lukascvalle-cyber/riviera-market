@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
-import { CATEGORY_LABELS, CATEGORY_EMOJI } from '../../lib/constants'
+import { useTranslation } from 'react-i18next'
+import { CATEGORY_EMOJI } from '../../lib/constants'
 import { Button } from '../ui/Button'
-import type { VendorWithLocation } from '../../types'
+import type { VendorWithLocation, VendorCategory } from '../../types'
 
 interface VendorPopupProps {
   vendor: VendorWithLocation
@@ -10,6 +11,7 @@ interface VendorPopupProps {
 
 export function VendorPopup({ vendor, onClose }: VendorPopupProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
 
   return (
     <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-sm px-4 z-20">
@@ -23,14 +25,14 @@ export function VendorPopup({ vendor, onClose }: VendorPopupProps) {
         )}
         <div className="flex-1 min-w-0">
           <p className="font-display font-semibold text-gray-900 truncate">{vendor.display_name}</p>
-          <p className="text-sm text-gray-500 font-body">{CATEGORY_LABELS[vendor.category]}</p>
+          <p className="text-sm text-gray-500 font-body">{t(`categories.${vendor.category as VendorCategory}`)}</p>
         </div>
         <div className="flex flex-col gap-1.5">
           <Button size="sm" onClick={() => { navigate(`/app/vendedor/${vendor.id}`); onClose() }}>
-            Ver cardápio
+            {t('map.viewMenu')}
           </Button>
           <button onClick={onClose} className="text-xs text-gray-400 hover:text-gray-600 font-body text-center">
-            Fechar
+            {t('common.close')}
           </button>
         </div>
       </div>

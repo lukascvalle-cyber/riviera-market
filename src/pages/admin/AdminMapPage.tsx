@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { BeachMap, type BeachMapHandle } from '../../components/map/BeachMap'
 import { VendorPin } from '../../components/map/VendorPin'
 import { MapLegend } from '../../components/map/MapLegend'
@@ -12,6 +13,7 @@ export function AdminMapPage() {
   const [map, setMap] = useState<MapboxMap | null>(null)
   const [allVendors, setAllVendors] = useState<VendorWithLocation[]>([])
   const { vendors: activeVendors } = useVendorLocation()
+  const { t } = useTranslation()
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -39,8 +41,8 @@ export function AdminMapPage() {
     <div className="h-full relative">
       <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-sm rounded-2xl shadow px-4 py-2">
         <p className="text-sm font-body font-semibold text-gray-700">
-          🟢 {activeVendors.filter(v => v.location).length} ao vivo
-          <span className="text-gray-400 ml-2">· {allVendors.length} cadastrados</span>
+          🟢 {activeVendors.filter(v => v.location).length} {t('admin.liveCount')}
+          <span className="text-gray-400 ml-2">· {allVendors.length} {t('admin.registeredCount')}</span>
         </p>
       </div>
       <BeachMap ref={mapRef} className="w-full h-full" />

@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { MenuItemCard } from '../../components/vendor/MenuItemCard'
 import { CartDrawer } from '../../components/order/CartDrawer'
 import { Spinner } from '../../components/ui/Spinner'
-import { CATEGORY_LABELS, CATEGORY_EMOJI } from '../../lib/constants'
+import { CATEGORY_EMOJI } from '../../lib/constants'
 import { useCart } from '../../contexts/CartContext'
 import type { Vendor, Product } from '../../types'
+import type { VendorCategory } from '../../types'
 
 export function VendorProfilePage() {
   const { vendorId } = useParams<{ vendorId: string }>()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [vendor, setVendor] = useState<Vendor | null>(null)
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
@@ -30,7 +33,7 @@ export function VendorProfilePage() {
   }, [vendorId])
 
   if (loading) return <div className="flex items-center justify-center h-full"><Spinner size="lg" /></div>
-  if (!vendor) return <div className="p-8 text-center text-gray-500 font-body">Vendedor não encontrado.</div>
+  if (!vendor) return <div className="p-8 text-center text-gray-500 font-body">{t('vendor.notFound')}</div>
 
   return (
     <div className="min-h-screen bg-sand pb-24">
@@ -51,7 +54,7 @@ export function VendorProfilePage() {
           )}
           <div>
             <h1 className="font-display font-bold text-gray-900 text-lg leading-tight">{vendor.display_name}</h1>
-            <p className="text-sm text-gray-500 font-body">{CATEGORY_LABELS[vendor.category]}</p>
+            <p className="text-sm text-gray-500 font-body">{t(`categories.${vendor.category as VendorCategory}`)}</p>
           </div>
           <div className="ml-auto relative">
             <button
@@ -76,9 +79,9 @@ export function VendorProfilePage() {
       )}
 
       <div className="max-w-xl mx-auto px-4 py-4 flex flex-col gap-3">
-        <h2 className="font-display text-xl font-semibold text-gray-900">Cardápio</h2>
+        <h2 className="font-display text-xl font-semibold text-gray-900">{t('vendor.menu')}</h2>
         {products.length === 0 ? (
-          <p className="text-gray-400 font-body text-center py-8">Nenhum produto disponível no momento.</p>
+          <p className="text-gray-400 font-body text-center py-8">{t('vendor.noProducts')}</p>
         ) : (
           products.map(p => <MenuItemCard key={p.id} product={p} />)
         )}

@@ -1,13 +1,16 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
-
-const NAV = [
-  { to: '/app', label: 'Mapa', icon: '🗺️', end: true },
-  { to: '/app/pedidos', label: 'Pedidos', icon: '📋', end: false },
-]
+import { LanguageSelector } from '../../components/ui/LanguageSelector'
 
 export function FrequentadorApp() {
   const { signOut } = useAuth()
+  const { t } = useTranslation()
+
+  const NAV = [
+    { to: '/app', label: t('nav.map'), icon: '🗺️', end: true },
+    { to: '/app/pedidos', label: t('nav.orders'), icon: '📋', end: false },
+  ]
 
   return (
     <div className="flex flex-col h-screen">
@@ -17,9 +20,12 @@ export function FrequentadorApp() {
           <span className="font-display font-bold text-coral text-lg">Riviera</span>
           <span className="font-display text-ocean text-lg ml-1">Market</span>
         </div>
-        <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">
-          Sair
-        </button>
+        <div className="flex items-center gap-3">
+          <LanguageSelector />
+          <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">
+            {t('common.logout')}
+          </button>
+        </div>
       </header>
 
       {/* Map/content area */}

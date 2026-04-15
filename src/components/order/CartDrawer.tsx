@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrders } from '../../hooks/useOrders'
@@ -15,6 +16,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, vendorId, removeItem, updateQuantity, clearCart, total, itemCount } = useCart()
   const { user } = useAuth()
   const toast = useToast()
+  const { t } = useTranslation()
   const { createOrder } = useOrders('frequentador', user?.id ?? null)
   const [deliveryLocation, setDeliveryLocation] = useState('')
   const [notes, setNotes] = useState('')
@@ -22,12 +24,12 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
   async function handlePlaceOrder() {
     if (!vendorId) return
-    if (!deliveryLocation.trim()) { toast('Indique a sua localização na praia', 'error'); return }
+    if (!deliveryLocation.trim()) { toast(t('cart.locationRequired'), 'error'); return }
     setPlacing(true)
     const { error } = await createOrder(vendorId, items, deliveryLocation, notes || undefined)
     setPlacing(false)
-    if (error) { toast('Erro ao fazer pedido. Tente novamente.', 'error'); return }
-    toast('Pedido feito com sucesso! O vendedor irá confirmar em breve.', 'success')
+    if (error) { toast(t('cart.orderError'), 'error'); return }
+    toast(t('cart.orderSuccess'), 'success')
     clearCart()
     onClose()
   }
@@ -40,7 +42,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
       <div className="relative bg-white w-full max-w-lg rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
         <div className="p-5 border-b border-sand-200 flex items-center justify-between">
           <h2 className="font-display text-xl font-semibold">
-            Carrinho <span className="text-coral">({itemCount})</span>
+            {t('cart.title')} <span className="text-coral">({itemCount})</span>
           </h2>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,7 +53,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
         <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-3">
           {items.length === 0 ? (
-            <p className="text-center text-gray-400 font-body py-8">O seu carrinho está vazio</p>
+            <p className="text-center text-gray-400 font-body py-8">{t('cart.empty')}</p>
           ) : (
             <>
               {items.map(item => (
@@ -86,23 +88,23 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
               <div className="border-t border-sand-200 pt-3 mt-2">
                 <div className="flex justify-between font-display font-bold text-lg">
-                  <span>Total</span>
+                  <span>{t('cart.total')}</span>
                   <span className="text-coral">R$ {total.toFixed(2).replace('.', ',')}</span>
                 </div>
               </div>
 
               <Input
-                label="Onde você está na praia?"
-                placeholder="Ex: guarda-sol 14, setor B, perto dos coqueiros..."
+                label={t('cart.locationLabel')}
+                placeholder={t('cart.locationPlaceholder')}
                 value={deliveryLocation}
                 onChange={e => setDeliveryLocation(e.target.value)}
               />
               <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-gray-700 font-body">Observações (opcional)</label>
+                <label className="text-sm font-semibold text-gray-700 font-body">{t('cart.notesLabel')}</label>
                 <textarea
                   className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral resize-none"
                   rows={2}
-                  placeholder="Sem gelo, extra limão..."
+                  placeholder={t('cart.notesPlaceholder')}
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                 />
@@ -114,7 +116,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         {items.length > 0 && (
           <div className="p-5 border-t border-sand-200">
             <Button fullWidth size="lg" loading={placing} onClick={handlePlaceOrder}>
-              Fazer pedido · R$ {total.toFixed(2).replace('.', ',')}
+              {t('cart.placeOrder')} {total.toFixed(2).replace('.', ',')}
             </Button>
           </div>
         )}

@@ -15,12 +15,26 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled'
 
+export interface Module {
+  id: number
+  number: number
+  name: string
+}
+
+export interface Building {
+  id: number
+  module_id: number
+  name: string
+}
+
 export interface Profile {
   id: string
   role: UserRole
   full_name: string
   phone: string | null
   avatar_url: string | null
+  module_id: number | null
+  building_id: number | null
   created_at: string
   updated_at: string
 }

@@ -1,14 +1,17 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
-
-const NAV = [
-  { to: '/vendedor', label: 'Pedidos', icon: '📋', end: true },
-  { to: '/vendedor/cardapio', label: 'Cardápio', icon: '🍽️', end: false },
-  { to: '/vendedor/perfil', label: 'Perfil', icon: '👤', end: false },
-]
+import { LanguageSelector } from '../../components/ui/LanguageSelector'
 
 export function VendedorApp() {
   const { signOut, vendor } = useAuth()
+  const { t } = useTranslation()
+
+  const NAV = [
+    { to: '/vendedor', label: t('nav.orders'), icon: '📋', end: true },
+    { to: '/vendedor/cardapio', label: t('nav.menu'), icon: '🍽️', end: false },
+    { to: '/vendedor/perfil', label: t('nav.profile'), icon: '👤', end: false },
+  ]
 
   return (
     <div className="flex flex-col h-screen bg-sand">
@@ -20,7 +23,12 @@ export function VendedorApp() {
             <span className="ml-2 text-sm text-gray-500 font-body">· {vendor.display_name}</span>
           )}
         </div>
-        <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">Sair</button>
+        <div className="flex items-center gap-3">
+          <LanguageSelector />
+          <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">
+            {t('common.logout')}
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 overflow-y-auto">

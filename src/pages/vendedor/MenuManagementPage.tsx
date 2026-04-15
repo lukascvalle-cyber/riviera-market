@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { useVendorMenu } from '../../hooks/useVendorMenu'
 import { MenuItemCard } from '../../components/vendor/MenuItemCard'
@@ -13,6 +14,7 @@ export function MenuManagementPage() {
   const { vendor } = useAuth()
   const { products, loading, toggleAvailability, refresh } = useVendorMenu(vendor?.id ?? null)
   const toast = useToast()
+  const { t } = useTranslation()
   const [modalOpen, setModalOpen] = useState(false)
   const [editProduct, setEditProduct] = useState<Product | undefined>()
 
@@ -22,7 +24,7 @@ export function MenuManagementPage() {
 
   async function handleToggle(id: string, available: boolean) {
     await toggleAvailability(id, available)
-    toast(available ? 'Produto disponível' : 'Produto pausado', 'info')
+    toast(available ? t('vendor.productAvailable') : t('vendor.productPaused'), 'info')
   }
 
   if (!vendor) return null
@@ -30,8 +32,8 @@ export function MenuManagementPage() {
   return (
     <div className="max-w-xl mx-auto px-4 py-5">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="font-display text-xl font-semibold text-gray-900">Meu cardápio</h2>
-        <Button size="sm" onClick={openCreate}>+ Adicionar</Button>
+        <h2 className="font-display text-xl font-semibold text-gray-900">{t('vendor.myMenu')}</h2>
+        <Button size="sm" onClick={openCreate}>{t('vendor.add')}</Button>
       </div>
 
       {loading ? (
@@ -39,8 +41,8 @@ export function MenuManagementPage() {
       ) : products.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-4xl mb-3">🍽️</p>
-          <p className="text-gray-500 font-body mb-4">O seu cardápio está vazio</p>
-          <Button onClick={openCreate}>Criar primeiro produto</Button>
+          <p className="text-gray-500 font-body mb-4">{t('vendor.menuEmpty')}</p>
+          <Button onClick={openCreate}>{t('vendor.createFirst')}</Button>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
@@ -50,7 +52,7 @@ export function MenuManagementPage() {
         </div>
       )}
 
-      <Modal open={modalOpen} onClose={closeModal} title={editProduct ? 'Editar produto' : 'Novo produto'}>
+      <Modal open={modalOpen} onClose={closeModal} title={editProduct ? t('vendor.editProduct') : t('vendor.newProduct')}>
         <MenuItemForm
           vendorId={vendor.id}
           product={editProduct}

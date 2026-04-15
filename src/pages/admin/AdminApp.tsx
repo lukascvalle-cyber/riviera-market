@@ -1,15 +1,18 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
-
-const NAV = [
-  { to: '/admin', label: 'Dashboard', icon: '📊', end: true },
-  { to: '/admin/mapa', label: 'Mapa ao vivo', icon: '🗺️', end: false },
-  { to: '/admin/vendedores', label: 'Vendedores', icon: '🛍️', end: false },
-  { to: '/admin/pedidos', label: 'Pedidos', icon: '📦', end: false },
-]
+import { LanguageSelector } from '../../components/ui/LanguageSelector'
 
 export function AdminApp() {
   const { signOut } = useAuth()
+  const { t } = useTranslation()
+
+  const NAV = [
+    { to: '/admin', label: t('nav.dashboard'), icon: '📊', end: true },
+    { to: '/admin/mapa', label: t('nav.liveMap'), icon: '🗺️', end: false },
+    { to: '/admin/vendedores', label: t('nav.vendors'), icon: '🛍️', end: false },
+    { to: '/admin/pedidos', label: t('nav.orders'), icon: '📦', end: false },
+  ]
 
   return (
     <div className="flex h-screen bg-sand">
@@ -36,8 +39,11 @@ export function AdminApp() {
             </NavLink>
           ))}
         </nav>
-        <div className="p-4 border-t border-sand-200">
-          <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">Sair</button>
+        <div className="p-4 border-t border-sand-200 flex items-center justify-between">
+          <LanguageSelector />
+          <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">
+            {t('common.logout')}
+          </button>
         </div>
       </aside>
 
@@ -48,7 +54,12 @@ export function AdminApp() {
             <span className="font-display font-bold text-coral">Riviera</span>
             <span className="font-display text-ocean ml-1">· Admin</span>
           </div>
-          <button onClick={signOut} className="text-sm text-gray-400 font-body">Sair</button>
+          <div className="flex items-center gap-3">
+            <LanguageSelector />
+            <button onClick={signOut} className="text-sm text-gray-400 font-body">
+              {t('common.logout')}
+            </button>
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto">

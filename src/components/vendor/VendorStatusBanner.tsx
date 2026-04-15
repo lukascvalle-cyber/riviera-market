@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/Button'
 
 interface VendorStatusBannerProps {
@@ -9,12 +10,14 @@ interface VendorStatusBannerProps {
 }
 
 export function VendorStatusBanner({ isLive, isApproved, onGoLive, onGoOffline, error }: VendorStatusBannerProps) {
+  const { t } = useTranslation()
+
   if (!isApproved) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-4">
-        <p className="font-semibold text-yellow-800 font-body">Aguardando aprovação</p>
+        <p className="font-semibold text-yellow-800 font-body">{t('vendor.status.awaitingTitle')}</p>
         <p className="text-sm text-yellow-700 font-body mt-1">
-          A sua conta está a ser verificada pelo administrador da praia. Em breve poderá ativar a sua presença no mapa.
+          {t('vendor.status.awaitingMsg')}
         </p>
       </div>
     )
@@ -27,17 +30,17 @@ export function VendorStatusBanner({ isLive, isApproved, onGoLive, onGoOffline, 
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${isLive ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
             <p className="font-semibold font-body text-gray-900">
-              {isLive ? 'Você está ao vivo' : 'Você está offline'}
+              {isLive ? t('vendor.status.live') : t('vendor.status.offline')}
             </p>
           </div>
           <p className="text-sm text-gray-500 font-body mt-0.5">
-            {isLive ? 'A sua posição está visível no mapa.' : 'Ative para aparecer no mapa.'}
+            {isLive ? t('vendor.status.positionVisible') : t('vendor.status.activateToShow')}
           </p>
         </div>
         {isLive ? (
-          <Button variant="ghost" size="sm" onClick={onGoOffline}>Ir offline</Button>
+          <Button variant="ghost" size="sm" onClick={onGoOffline}>{t('vendor.status.goOffline')}</Button>
         ) : (
-          <Button size="sm" onClick={onGoLive}>Ir ao vivo</Button>
+          <Button size="sm" onClick={onGoLive}>{t('vendor.status.goLive')}</Button>
         )}
       </div>
       {error && <p className="text-xs text-red-600 mt-2 font-body">{error}</p>}

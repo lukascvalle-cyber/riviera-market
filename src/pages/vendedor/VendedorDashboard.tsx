@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { useVendorPresence } from '../../hooks/useVendorPresence'
 import { useOrders } from '../../hooks/useOrders'
@@ -12,13 +13,14 @@ export function VendedorDashboard() {
   const { isLive, error, goLive, goOffline } = useVendorPresence(vendor)
   const { orders, loading, updateStatus } = useOrders('vendedor', vendor?.id ?? null)
   const toast = useToast()
+  const { t } = useTranslation()
 
   const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status))
   const pastOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.status)).slice(0, 10)
 
   async function handleStatusUpdate(orderId: string, status: OrderStatus) {
     const ok = await updateStatus(orderId, status)
-    if (!ok) toast('Erro ao atualizar pedido', 'error')
+    if (!ok) toast(t('orders.updateError'), 'error')
   }
 
   return (
@@ -33,7 +35,7 @@ export function VendedorDashboard() {
 
       <section>
         <h2 className="font-display text-xl font-semibold text-gray-900 mb-3">
-          Pedidos ativos
+          {t('orders.active')}
           {activeOrders.length > 0 && (
             <span className="ml-2 bg-coral text-white text-sm px-2 py-0.5 rounded-full font-body font-bold">
               {activeOrders.length}
@@ -45,7 +47,7 @@ export function VendedorDashboard() {
         ) : activeOrders.length === 0 ? (
           <div className="text-center py-8 text-gray-400 font-body">
             <p className="text-3xl mb-2">📭</p>
-            <p>Sem pedidos pendentes</p>
+            <p>{t('orders.noPending')}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -58,7 +60,7 @@ export function VendedorDashboard() {
 
       {pastOrders.length > 0 && (
         <section>
-          <h2 className="font-display text-lg font-semibold text-gray-700 mb-3">Histórico recente</h2>
+          <h2 className="font-display text-lg font-semibold text-gray-700 mb-3">{t('orders.history')}</h2>
           <div className="flex flex-col gap-3">
             {pastOrders.map(o => (
               <OrderCard key={o.id} order={o} role="vendedor" />

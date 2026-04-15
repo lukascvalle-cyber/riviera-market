@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Spinner } from '../../components/ui/Spinner'
 import { useToast } from '../../components/ui/Toast'
-import { CATEGORY_LABELS, CATEGORY_EMOJI } from '../../lib/constants'
-import type { Vendor } from '../../types'
+import { CATEGORY_EMOJI } from '../../lib/constants'
+import type { Vendor, VendorCategory } from '../../types'
 
 export function VendorsManagementPage() {
   const [vendors, setVendors] = useState<Vendor[]>([])
   const [loading, setLoading] = useState(true)
   const toast = useToast()
+  const { t } = useTranslation()
 
   async function fetchVendors() {
     const { data } = await supabase.from('vendors').select('*').order('created_at', { ascending: false })
@@ -25,14 +27,14 @@ export function VendorsManagementPage() {
       .from('vendors')
       .update({ is_approved: !vendor.is_approved })
       .eq('id', vendor.id)
-    if (error) { toast('Erro ao atualizar vendedor', 'error'); return }
+    if (error) { toast(t('admin.vendorUpdateError'), 'error'); return }
     setVendors(prev => prev.map(v => v.id === vendor.id ? { ...v, is_approved: !v.is_approved } : v))
-    toast(vendor.is_approved ? 'Vendedor desativado' : 'Vendedor aprovado!', 'success')
+    toast(vendor.is_approved ? t('admin.vendorSuspended') : t('admin.vendorApproved'), 'success')
   }
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="font-display text-3xl font-bold text-gray-900 mb-6">Vendedores</h1>
+      <h1 className="font-display text-3xl font-bold text-gray-900 mb-6">{t('admin.vendors')}</h1>
       {loading ? (
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       ) : (
@@ -40,10 +42,10 @@ export function VendorsManagementPage() {
           <table className="w-full">
             <thead className="bg-sand-50 border-b border-sand-200">
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">Vendedor</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">Categoria</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">Status</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">Ação</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.vendor')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.category')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.status')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-sand-100">
@@ -61,13 +63,13 @@ export function VendorsManagementPage() {
                       <span className="font-semibold font-body text-gray-900">{v.display_name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-body text-gray-600">{CATEGORY_LABELS[v.category]}</td>
+                  <td className="px-4 py-3 text-sm font-body text-gray-600">{t(`categories.${v.category as VendorCategory}`)}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
                       <Badge className={v.is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
-                        {v.is_approved ? 'Aprovado' : 'Pendente'}
+                        {v.is_approved ? t('admin.approved') : t('admin.pending')}
                       </Badge>
-                      {v.is_active && <Badge className="bg-blue-100 text-blue-800">Ao vivo</Badge>}
+                      {v.is_active && <Badge className="bg-blue-100 text-blue-800">{t('admin.live')}</Badge>}
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -76,7 +78,7 @@ export function VendorsManagementPage() {
                       variant={v.is_approved ? 'danger' : 'secondary'}
                       onClick={() => toggleApproval(v)}
                     >
-                      {v.is_approved ? 'Suspender' : 'Aprovar'}
+                      {v.is_approved ? t('admin.suspend') : t('admin.approve')}
                     </Button>
                   </td>
                 </tr>

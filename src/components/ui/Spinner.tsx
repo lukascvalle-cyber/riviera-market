@@ -13,7 +13,7 @@ export function FullPageSpinner() {
     <div className="min-h-screen bg-sand flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <Spinner size="lg" />
-        <p className="text-gray-500 font-body">A carregar...</p>
+        <p className="text-gray-500 font-body">Carregando...</p>
       </div>
     </div>
   )

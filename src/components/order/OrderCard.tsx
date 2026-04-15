@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { OrderStatusBadge } from './OrderStatusBadge'
 import { Button } from '../ui/Button'
 import { CATEGORY_EMOJI } from '../../lib/constants'
@@ -9,15 +10,17 @@ interface OrderCardProps {
   onUpdateStatus?: (orderId: string, status: OrderStatus) => void
 }
 
-const VENDOR_ACTIONS: Partial<Record<OrderStatus, { label: string; next: OrderStatus }>> = {
-  pending: { label: 'Confirmar pedido', next: 'confirmed' },
-  confirmed: { label: 'A caminho', next: 'delivering' },
-  delivering: { label: 'Marcar entregue', next: 'delivered' },
-}
-
 export function OrderCard({ order, role, onUpdateStatus }: OrderCardProps) {
-  const action = role === 'vendedor' ? VENDOR_ACTIONS[order.status] : null
+  const { t } = useTranslation()
   const createdAt = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+
+  const VENDOR_ACTIONS: Partial<Record<OrderStatus, { label: string; next: OrderStatus }>> = {
+    pending: { label: t('orders.confirm'), next: 'confirmed' },
+    confirmed: { label: t('orders.onTheWay'), next: 'delivering' },
+    delivering: { label: t('orders.markDelivered'), next: 'delivered' },
+  }
+
+  const action = role === 'vendedor' ? VENDOR_ACTIONS[order.status] : null
 
   return (
     <div className="bg-white rounded-2xl border border-sand-200 p-4 flex flex-col gap-3">
@@ -28,7 +31,7 @@ export function OrderCard({ order, role, onUpdateStatus }: OrderCardProps) {
               <span className="text-lg">{CATEGORY_EMOJI[order.vendor.category]}</span>
             )}
             <p className="font-semibold font-body text-gray-900">
-              {order.vendor?.display_name ?? 'Pedido'}
+              {order.vendor?.display_name ?? t('nav.orders')}
             </p>
           </div>
           <p className="text-xs text-gray-400 font-body mt-0.5">{createdAt}</p>
@@ -63,7 +66,7 @@ export function OrderCard({ order, role, onUpdateStatus }: OrderCardProps) {
         )}
         {role === 'vendedor' && order.status === 'pending' && onUpdateStatus && (
           <Button size="sm" variant="danger" className="ml-2" onClick={() => onUpdateStatus(order.id, 'cancelled')}>
-            Recusar
+            {t('orders.reject')}
           </Button>
         )}
       </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Button } from '../ui/Button'
 import { useCart } from '../../contexts/CartContext'
 import type { Product } from '../../types'
@@ -11,6 +12,7 @@ interface MenuItemCardProps {
 
 export function MenuItemCard({ product, editable, onEdit, onToggle }: MenuItemCardProps) {
   const { addItem, items, vendorId } = useCart()
+  const { t } = useTranslation()
   const cartQty = items.find(i => i.product.id === product.id)?.quantity ?? 0
   const wrongVendor = vendorId !== null && vendorId !== product.vendor_id
 
@@ -35,18 +37,18 @@ export function MenuItemCard({ product, editable, onEdit, onToggle }: MenuItemCa
           R$ {product.price_brl.toFixed(2).replace('.', ',')}
         </p>
         {!product.is_available && (
-          <span className="text-xs text-gray-400 font-body">Indisponível</span>
+          <span className="text-xs text-gray-400 font-body">{t('product.unavailable')}</span>
         )}
       </div>
       <div className="shrink-0 flex flex-col items-end justify-between">
         {editable ? (
           <div className="flex flex-col gap-1.5">
-            <Button size="sm" variant="ghost" onClick={() => onEdit?.(product)}>Editar</Button>
+            <Button size="sm" variant="ghost" onClick={() => onEdit?.(product)}>{t('product.edit')}</Button>
             <button
               className={`text-xs font-body px-2 py-1 rounded-lg border transition-colors ${product.is_available ? 'border-green-300 text-green-700 hover:bg-green-50' : 'border-red-300 text-red-700 hover:bg-red-50'}`}
               onClick={() => onToggle?.(product.id, !product.is_available)}
             >
-              {product.is_available ? 'Disponível' : 'Pausado'}
+              {product.is_available ? t('product.available') : t('product.paused')}
             </button>
           </div>
         ) : (
@@ -61,7 +63,7 @@ export function MenuItemCard({ product, editable, onEdit, onToggle }: MenuItemCa
                 size="sm"
                 onClick={handleAdd}
                 disabled={wrongVendor}
-                title={wrongVendor ? 'Limpa o carrinho para comprar de outro vendedor' : undefined}
+                title={wrongVendor ? t('cart.clearCartTooltip') : undefined}
               >
                 +
               </Button>
