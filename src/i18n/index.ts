@@ -10,14 +10,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      'pt-BR': { translation: ptBR },
+      pt: { translation: ptBR },
       en: { translation: en },
       es: { translation: es },
     },
-    fallbackLng: 'pt-BR',
-    supportedLngs: ['pt-BR', 'en', 'es'],
-    nonExplicitSupportedLngs: true,
-    initImmediate: false,
+    fallbackLng: 'pt',
+    supportedLngs: ['pt', 'en', 'es'],
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],

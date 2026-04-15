@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 const LANGS = [
-  { code: 'pt-BR', label: 'PT' },
+  { code: 'pt', label: 'PT' },
   { code: 'en', label: 'EN' },
   { code: 'es', label: 'ES' },
 ]
@@ -11,7 +11,6 @@ export function LanguageSelector() {
   const resolved = i18n.resolvedLanguage ?? i18n.language
 
   function isActive(code: string) {
-    if (code === 'pt-BR') return resolved === 'pt-BR' || resolved === 'pt'
     return resolved === code || resolved.startsWith(code + '-')
   }
 
