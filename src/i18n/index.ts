@@ -17,6 +17,7 @@ i18n
     fallbackLng: 'pt-BR',
     supportedLngs: ['pt-BR', 'en', 'es'],
     nonExplicitSupportedLngs: true,
+    initImmediate: false,
     interpolation: { escapeValue: false },
     detection: {
       order: ['localStorage', 'navigator'],
