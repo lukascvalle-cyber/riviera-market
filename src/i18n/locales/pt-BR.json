@@ -14,7 +14,8 @@
       "submit": "Entrar",
       "noAccount": "Novo por aqui?",
       "createAccount": "Criar conta",
-      "invalidCredentials": "E-mail ou senha incorretos."
+      "invalidCredentials": "E-mail ou senha incorretos.",
+      "vendorRegisterLink": "Sou vendedor na Riviera"
     },
     "register": {
       "title": "Criar conta",
@@ -24,7 +25,10 @@
       "submit": "Criar conta",
       "hasAccount": "Já tem conta?",
       "loginLink": "Entrar",
-      "success": "Conta criada! Verifique seu e-mail para confirmar."
+      "success": "Conta criada! Verifique seu e-mail para confirmar.",
+      "confirmedTitle": "Cadastro realizado! 🎉",
+      "confirmedBody": "Enviamos um e-mail de confirmação para você. Por favor verifique sua caixa de entrada e clique no link para ativar sua conta.",
+      "backToLogin": "Voltar ao login"
     },
     "validation": {
       "nameTooShort": "Nome muito curto",
@@ -40,6 +44,42 @@
       "optional": "(opcional)"
     }
   },
+  "vendorRegister": {
+    "pageTitle": "Cadastro de Vendedor",
+    "subtitle": "Preencha o formulário para solicitar autorização para vender na Riviera de São Lourenço",
+    "section1": "Dados pessoais",
+    "section2": "Como você vende",
+    "section3": "Documentos",
+    "section4": "Acesso ao sistema",
+    "fullName": "Nome completo",
+    "cpf": "CPF",
+    "cpfHint": "Somente números (11 dígitos)",
+    "phone": "Telefone / WhatsApp",
+    "phoneHint": "Com DDD, ex: (13) 9xxxx-xxxx",
+    "profilePhoto": "Foto de perfil",
+    "profilePhotoHint": "Uma foto sua para identificação",
+    "vendorType": "Tipo de vendedor",
+    "ambulante": "Ambulante (percorre a praia)",
+    "barraca_fixa": "Barraca fixa",
+    "modules": "Módulos onde você atua",
+    "modulesHint": "Selecione todos os módulos onde pretende trabalhar",
+    "module": "Módulo",
+    "productsDescription": "Descrição dos produtos",
+    "productsDescriptionPlaceholder": "Descreva o que você vende: tipo de produtos, marcas, preços médios...",
+    "authorizationDoc": "Autorização da Riviera / Sobloco",
+    "authorizationDocHint": "Documento emitido pela administração autorizando sua atuação na praia",
+    "identityDoc": "Documento de identidade",
+    "identityDocHint": "RG, CNH ou outro documento oficial com foto",
+    "email": "E-mail",
+    "password": "Senha de acesso",
+    "submit": "Enviar cadastro",
+    "successTitle": "Cadastro recebido!",
+    "successBody": "Seu cadastro foi enviado com sucesso. Nossa equipe irá analisar os documentos em até 48 horas e você receberá uma resposta pelo e-mail cadastrado.",
+    "backToLogin": "Voltar ao login",
+    "loginLink": "Já tem acesso?",
+    "vendorLoginLink": "Entrar como vendedor",
+    "errorSubmit": "Erro ao enviar o cadastro. Verifique os dados e tente novamente."
+  },
   "nav": {
     "map": "Mapa",
     "orders": "Pedidos",
@@ -47,7 +87,8 @@
     "profile": "Perfil",
     "dashboard": "Dashboard",
     "liveMap": "Mapa ao vivo",
-    "vendors": "Vendedores"
+    "vendors": "Vendedores",
+    "applications": "Cadastros"
   },
   "map": {
     "loading": "Carregando vendedores...",
@@ -147,10 +188,12 @@
   },
   "admin": {
     "dashboard": "Dashboard",
+    "totalUsers": "Clientes registados",
     "activeVendors": "Vendedores ativos",
     "ordersToday": "Pedidos hoje",
     "pendingOrders": "Pedidos pendentes",
     "totalVendors": "Total vendedores",
+    "revenueToday": "Receita estimada hoje",
     "autoUpdate": "Atualizado automaticamente a cada 30 segundos",
     "vendors": "Vendedores",
     "orders": "Pedidos",
@@ -166,6 +209,27 @@
     "vendorUpdateError": "Erro ao atualizar vendedor",
     "vendorSuspended": "Vendedor desativado",
     "vendorApproved": "Vendedor aprovado!",
+    "applicationsTitle": "Cadastros de Vendedores",
+    "applicationsSubtitle": "Revise e aprove os cadastros de vendedores aguardando análise",
+    "tab_pending": "Aguardando",
+    "tab_approved": "Aprovados",
+    "tab_rejected": "Rejeitados",
+    "status_pending": "Aguardando",
+    "status_approved": "Aprovado",
+    "status_rejected": "Rejeitado",
+    "approveAction": "Aprovar",
+    "rejectAction": "Rejeitar",
+    "rejectReason": "Motivo da rejeição",
+    "rejectReasonPlaceholder": "Explique por que o cadastro foi rejeitado...",
+    "confirmReject": "Confirmar rejeição",
+    "approveSuccess": "Vendedor aprovado com sucesso!",
+    "rejectSuccess": "Cadastro rejeitado",
+    "documents": "Documentos",
+    "noApplications": "Nenhum cadastro encontrado",
+    "vendorType": "Tipo de vendedor",
+    "modules": "Módulos",
+    "phone": "Telefone",
+    "cpf": "CPF",
     "time": "Hora",
     "items": "Itens",
     "total": "Total",
@@ -182,6 +246,21 @@
     "artesanato": "Artesanato",
     "equipamentos": "Equipamentos",
     "outros": "Outros"
+  },
+  "tracking": {
+    "title": "Rastreamento",
+    "trackButton": "Rastrear",
+    "waitingConfirmation": "Aguardando confirmação do vendedor...",
+    "step": {
+      "confirmed": "Confirmado",
+      "delivering": "A caminho",
+      "delivered": "Entregue"
+    },
+    "delivered": "Pedido entregue!",
+    "deliveredMsg": "Seu pedido chegou. Aproveite! 🎉",
+    "backToMap": "Voltar ao mapa",
+    "backToOrders": "Voltar aos pedidos",
+    "noLocation": "Aguardando localização do vendedor..."
   },
   "orderStatus": {
     "pending": "Aguardando",

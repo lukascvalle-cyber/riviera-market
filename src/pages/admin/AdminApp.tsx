@@ -1,17 +1,29 @@
+import { useEffect, useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { LanguageSelector } from '../../components/ui/LanguageSelector'
+import { supabase } from '../../lib/supabase'
 
 export function AdminApp() {
   const { signOut } = useAuth()
   const { t } = useTranslation()
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    supabase
+      .from('vendor_applications')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', 'pending')
+      .then(({ count }) => { if (count !== null) setPendingCount(count) })
+  }, [])
 
   const NAV = [
-    { to: '/admin', label: t('nav.dashboard'), icon: '📊', end: true },
-    { to: '/admin/mapa', label: t('nav.liveMap'), icon: '🗺️', end: false },
-    { to: '/admin/vendedores', label: t('nav.vendors'), icon: '🛍️', end: false },
-    { to: '/admin/pedidos', label: t('nav.orders'), icon: '📦', end: false },
+    { to: '/admin', label: t('nav.dashboard'), icon: '📊', end: true, badge: 0 },
+    { to: '/admin/mapa', label: t('nav.liveMap'), icon: '🗺️', end: false, badge: 0 },
+    { to: '/admin/cadastros', label: t('nav.applications'), icon: '📝', end: false, badge: pendingCount },
+    { to: '/admin/vendedores', label: t('nav.vendors'), icon: '🛍️', end: false, badge: 0 },
+    { to: '/admin/pedidos', label: t('nav.orders'), icon: '📦', end: false, badge: 0 },
   ]
 
   return (
@@ -35,7 +47,12 @@ export function AdminApp() {
               }
             >
               <span>{item.icon}</span>
-              {item.label}
+              <span className="flex-1">{item.label}</span>
+              {item.badge > 0 && (
+                <span className="bg-coral text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0">
+                  {item.badge}
+                </span>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -78,7 +95,14 @@ export function AdminApp() {
                 }`
               }
             >
-              <span className="text-lg">{item.icon}</span>
+              <span className="relative text-lg">
+                {item.icon}
+                {item.badge > 0 && (
+                  <span className="absolute -top-1 -right-1.5 bg-coral text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                    {item.badge}
+                  </span>
+                )}
+              </span>
               {item.label}
             </NavLink>
           ))}

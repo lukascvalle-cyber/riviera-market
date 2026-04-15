@@ -41,7 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function refreshProfile() {
-    if (user) await loadProfile(user.id)
+    const { data: { user: currentUser } } = await supabase.auth.getUser()
+    if (currentUser) await loadProfile(currentUser.id)
   }
 
   useEffect(() => {

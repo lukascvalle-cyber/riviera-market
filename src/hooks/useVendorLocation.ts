@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
-import type { VendorWithLocation } from '../types'
+import type { VendorLocation, VendorWithLocation } from '../types'
 
 export function useVendorLocation() {
   const [vendors, setVendors] = useState<VendorWithLocation[]>([])
@@ -12,7 +12,7 @@ export function useVendorLocation() {
       .select(`
         *,
         vendor_locations (
-          latitude, longitude, accuracy, heading, updated_at
+          vendor_id, latitude, longitude, accuracy, heading, updated_at
         )
       `)
       .eq('is_active', true)
@@ -38,7 +38,27 @@ export function useVendorLocation() {
       .channel('vendor-locations')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'vendor_locations' },
+        { event: 'INSERT', schema: 'public', table: 'vendor_locations' },
+        (payload) => {
+          // New vendor came online — full refetch to add them to the list
+          fetchActiveVendors()
+          void payload
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'vendor_locations' },
+        (payload) => {
+          // Vendor moved — update only that vendor's location in-place (no refetch)
+          const loc = payload.new as VendorLocation
+          setVendors(prev =>
+            prev.map(v => v.id === loc.vendor_id ? { ...v, location: loc } : v),
+          )
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'vendor_locations' },
         () => { fetchActiveVendors() },
       )
       .on(

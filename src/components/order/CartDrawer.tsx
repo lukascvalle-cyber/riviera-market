@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../lib/supabase'
 import { useCart } from '../../contexts/CartContext'
@@ -18,6 +19,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { user } = useAuth()
   const toast = useToast()
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { createOrder } = useOrders('frequentador', user?.id ?? null)
 
   const [modules, setModules] = useState<Module[]>([])
@@ -74,12 +76,16 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
     const deliveryLocation = parts.join(' – ')
 
     setPlacing(true)
-    const { error } = await createOrder(vendorId, items, deliveryLocation, notes || undefined)
+    const { data: orderId, error } = await createOrder(vendorId, items, deliveryLocation, notes || undefined)
     setPlacing(false)
     if (error) { toast(t('cart.orderError'), 'error'); return }
-    toast(t('cart.orderSuccess'), 'success')
     clearCart()
     onClose()
+    if (orderId) {
+      navigate(`/app/rastreamento/${orderId}`)
+    } else {
+      toast(t('cart.orderSuccess'), 'success')
+    }
   }
 
   if (!open) return null

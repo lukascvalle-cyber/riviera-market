@@ -8,9 +8,10 @@ interface OrderCardProps {
   order: Order
   role: 'frequentador' | 'vendedor'
   onUpdateStatus?: (orderId: string, status: OrderStatus) => void
+  onTrack?: (orderId: string) => void
 }
 
-export function OrderCard({ order, role, onUpdateStatus }: OrderCardProps) {
+export function OrderCard({ order, role, onUpdateStatus, onTrack }: OrderCardProps) {
   const { t } = useTranslation()
   const createdAt = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -59,16 +60,26 @@ export function OrderCard({ order, role, onUpdateStatus }: OrderCardProps) {
             <p className="text-xs text-gray-500 font-body mt-0.5">📍 {order.delivery_location}</p>
           )}
         </div>
-        {action && onUpdateStatus && (
-          <Button size="sm" onClick={() => onUpdateStatus(order.id, action.next)}>
-            {action.label}
-          </Button>
-        )}
-        {role === 'vendedor' && order.status === 'pending' && onUpdateStatus && (
-          <Button size="sm" variant="danger" className="ml-2" onClick={() => onUpdateStatus(order.id, 'cancelled')}>
-            {t('orders.reject')}
-          </Button>
-        )}
+        <div className="flex items-center gap-2">
+          {/* Track button — only for frequentador on active orders */}
+          {role === 'frequentador'
+            && ['pending', 'confirmed', 'delivering'].includes(order.status)
+            && onTrack && (
+            <Button size="sm" variant="ghost" onClick={() => onTrack(order.id)}>
+              📍 {t('tracking.trackButton')}
+            </Button>
+          )}
+          {action && onUpdateStatus && (
+            <Button size="sm" onClick={() => onUpdateStatus(order.id, action.next)}>
+              {action.label}
+            </Button>
+          )}
+          {role === 'vendedor' && order.status === 'pending' && onUpdateStatus && (
+            <Button size="sm" variant="danger" onClick={() => onUpdateStatus(order.id, 'cancelled')}>
+              {t('orders.reject')}
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

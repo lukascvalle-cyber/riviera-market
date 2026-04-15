@@ -8,12 +8,14 @@ import { FullPageSpinner } from './components/ui/Spinner'
 // Auth pages
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
+import { VendorRegisterPage } from './pages/auth/VendorRegisterPage'
 
 // Frequentador
 import { FrequentadorApp } from './pages/frequentador/FrequentadorApp'
 import { MapView } from './pages/frequentador/MapView'
 import { VendorProfilePage } from './pages/frequentador/VendorProfilePage'
 import { MyOrdersPage } from './pages/frequentador/MyOrdersPage'
+import { OrderTrackingPage } from './pages/frequentador/OrderTrackingPage'
 
 // Vendedor
 import { VendedorApp } from './pages/vendedor/VendedorApp'
@@ -27,6 +29,7 @@ import { AdminDashboard } from './pages/admin/AdminDashboard'
 import { AdminMapPage } from './pages/admin/AdminMapPage'
 import { VendorsManagementPage } from './pages/admin/VendorsManagementPage'
 import { OrdersManagementPage } from './pages/admin/OrdersManagementPage'
+import { VendorApplicationsPage } from './pages/admin/VendorApplicationsPage'
 
 function RootRedirect() {
   const { user, profile, loading } = useAuth()
@@ -43,6 +46,7 @@ function AppRoutes() {
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/cadastro-vendedor" element={<VendorRegisterPage />} />
 
       {/* Frequentador */}
       <Route
@@ -56,6 +60,7 @@ function AppRoutes() {
         <Route index element={<MapView />} />
         <Route path="vendedor/:vendorId" element={<VendorProfilePage />} />
         <Route path="pedidos" element={<MyOrdersPage />} />
+        <Route path="rastreamento/:orderId" element={<OrderTrackingPage />} />
       </Route>
 
       {/* Vendedor */}
@@ -85,6 +90,7 @@ function AppRoutes() {
         <Route path="mapa" element={<AdminMapPage />} />
         <Route path="vendedores" element={<VendorsManagementPage />} />
         <Route path="pedidos" element={<OrdersManagementPage />} />
+        <Route path="cadastros" element={<VendorApplicationsPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -55,4 +55,4 @@ export const ORDER_STATUS_COLORS: Record<string, string> = {
   cancelled: 'bg-red-100 text-red-800',
 }
 
-export const GPS_INTERVAL_MS = 10_000
+export const GPS_INTERVAL_MS = 5_000

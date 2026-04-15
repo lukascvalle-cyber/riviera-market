@@ -11,7 +11,15 @@ interface VendorPinProps {
 
 export function VendorPin({ map, vendor, onClick }: VendorPinProps) {
   const markerRef = useRef<mapboxgl.Marker | null>(null)
+  // Keep latest vendor + callback in refs so the marker click always has fresh data
+  // without needing to recreate the marker on every change.
+  const vendorRef = useRef(vendor)
+  const onClickRef = useRef(onClick)
+  useEffect(() => { vendorRef.current = vendor }, [vendor])
+  useEffect(() => { onClickRef.current = onClick }, [onClick])
 
+  // Create the marker once per (map, vendor.id, vendor.category).
+  // vendor.category is included because it determines the colour/emoji of the pin.
   useEffect(() => {
     if (!vendor.location) return
 
@@ -30,7 +38,8 @@ export function VendorPin({ map, vendor, onClick }: VendorPinProps) {
     el.title = vendor.display_name
     el.addEventListener('mouseenter', () => { el.style.transform = 'scale(1.15)' })
     el.addEventListener('mouseleave', () => { el.style.transform = 'scale(1)' })
-    el.addEventListener('click', () => onClick(vendor))
+    // Use refs so click always passes the latest vendor object
+    el.addEventListener('click', () => onClickRef.current(vendorRef.current))
 
     const marker = new mapboxgl.Marker({ element: el })
       .setLngLat([vendor.location.longitude, vendor.location.latitude])
@@ -42,9 +51,10 @@ export function VendorPin({ map, vendor, onClick }: VendorPinProps) {
       marker.remove()
       markerRef.current = null
     }
-  }, [map, vendor, onClick])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, vendor.id, vendor.category])
 
-  // Update position if location changes
+  // Smooth real-time position update — no marker recreation needed
   useEffect(() => {
     if (markerRef.current && vendor.location) {
       markerRef.current.setLngLat([vendor.location.longitude, vendor.location.latitude])

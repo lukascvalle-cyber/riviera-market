@@ -14,7 +14,8 @@
       "submit": "Sign in",
       "noAccount": "New here?",
       "createAccount": "Create account",
-      "invalidCredentials": "Incorrect email or password."
+      "invalidCredentials": "Incorrect email or password.",
+      "vendorRegisterLink": "I'm a vendor at Riviera"
     },
     "register": {
       "title": "Create account",
@@ -24,7 +25,10 @@
       "submit": "Create account",
       "hasAccount": "Already have an account?",
       "loginLink": "Sign in",
-      "success": "Account created! Check your email to confirm."
+      "success": "Account created! Check your email to confirm.",
+      "confirmedTitle": "You're all set! 🎉",
+      "confirmedBody": "We sent a confirmation email to you. Please check your inbox and click the link to activate your account.",
+      "backToLogin": "Back to login"
     },
     "validation": {
       "nameTooShort": "Name too short",
@@ -40,6 +44,42 @@
       "optional": "(optional)"
     }
   },
+  "vendorRegister": {
+    "pageTitle": "Vendor Registration",
+    "subtitle": "Fill out the form to request authorization to sell at Riviera de São Lourenço",
+    "section1": "Personal info",
+    "section2": "How you sell",
+    "section3": "Documents",
+    "section4": "Account access",
+    "fullName": "Full name",
+    "cpf": "CPF (Brazilian ID number)",
+    "cpfHint": "Numbers only (11 digits)",
+    "phone": "Phone / WhatsApp",
+    "phoneHint": "With area code",
+    "profilePhoto": "Profile photo",
+    "profilePhotoHint": "A photo of yourself for identification",
+    "vendorType": "Vendor type",
+    "ambulante": "Ambulant (walks the beach)",
+    "barraca_fixa": "Fixed stand",
+    "modules": "Modules where you operate",
+    "modulesHint": "Select all modules where you intend to work",
+    "module": "Module",
+    "productsDescription": "Products description",
+    "productsDescriptionPlaceholder": "Describe what you sell: product types, brands, average prices...",
+    "authorizationDoc": "Riviera / Sobloco authorization",
+    "authorizationDocHint": "Document issued by the administration authorizing your operation on the beach",
+    "identityDoc": "Identity document",
+    "identityDocHint": "Government-issued ID with photo",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Submit registration",
+    "successTitle": "Registration received!",
+    "successBody": "Your registration was submitted successfully. Our team will review the documents within 48 hours and you will receive a response at the registered email.",
+    "backToLogin": "Back to login",
+    "loginLink": "Already have access?",
+    "vendorLoginLink": "Sign in as vendor",
+    "errorSubmit": "Error submitting registration. Please check your data and try again."
+  },
   "nav": {
     "map": "Map",
     "orders": "Orders",
@@ -47,7 +87,8 @@
     "profile": "Profile",
     "dashboard": "Dashboard",
     "liveMap": "Live map",
-    "vendors": "Vendors"
+    "vendors": "Vendors",
+    "applications": "Registrations"
   },
   "map": {
     "loading": "Loading vendors...",
@@ -147,10 +188,12 @@
   },
   "admin": {
     "dashboard": "Dashboard",
+    "totalUsers": "Registered customers",
     "activeVendors": "Active vendors",
     "ordersToday": "Orders today",
     "pendingOrders": "Pending orders",
     "totalVendors": "Total vendors",
+    "revenueToday": "Estimated revenue today",
     "autoUpdate": "Auto-updated every 30 seconds",
     "vendors": "Vendors",
     "orders": "Orders",
@@ -166,6 +209,27 @@
     "vendorUpdateError": "Error updating vendor",
     "vendorSuspended": "Vendor suspended",
     "vendorApproved": "Vendor approved!",
+    "applicationsTitle": "Vendor Registrations",
+    "applicationsSubtitle": "Review and approve vendor registrations awaiting analysis",
+    "tab_pending": "Pending",
+    "tab_approved": "Approved",
+    "tab_rejected": "Rejected",
+    "status_pending": "Pending",
+    "status_approved": "Approved",
+    "status_rejected": "Rejected",
+    "approveAction": "Approve",
+    "rejectAction": "Reject",
+    "rejectReason": "Rejection reason",
+    "rejectReasonPlaceholder": "Explain why the registration was rejected...",
+    "confirmReject": "Confirm rejection",
+    "approveSuccess": "Vendor approved successfully!",
+    "rejectSuccess": "Registration rejected",
+    "documents": "Documents",
+    "noApplications": "No registrations found",
+    "vendorType": "Vendor type",
+    "modules": "Modules",
+    "phone": "Phone",
+    "cpf": "CPF",
     "time": "Time",
     "items": "Items",
     "total": "Total",
@@ -182,6 +246,21 @@
     "artesanato": "Crafts",
     "equipamentos": "Equipment",
     "outros": "Other"
+  },
+  "tracking": {
+    "title": "Tracking",
+    "trackButton": "Track",
+    "waitingConfirmation": "Waiting for vendor confirmation...",
+    "step": {
+      "confirmed": "Confirmed",
+      "delivering": "On the way",
+      "delivered": "Delivered"
+    },
+    "delivered": "Order delivered!",
+    "deliveredMsg": "Your order has arrived. Enjoy! 🎉",
+    "backToMap": "Back to map",
+    "backToOrders": "Back to orders",
+    "noLocation": "Waiting for vendor location..."
   },
   "orderStatus": {
     "pending": "Pending",

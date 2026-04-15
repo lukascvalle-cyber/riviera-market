@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -14,9 +14,10 @@ type FormValues = { email: string; password: string }
 
 export function LoginPage() {
   const navigate = useNavigate()
-  const { refreshProfile } = useAuth()
+  const { profile, refreshProfile } = useAuth()
   const { t } = useTranslation()
   const [error, setError] = useState<string | null>(null)
+  const [loginAttempted, setLoginAttempted] = useState(false)
 
   const schema = z.object({
     email: z.string().email(t('auth.validation.invalidEmail')),
@@ -29,15 +30,23 @@ export function LoginPage() {
 
   async function onSubmit({ email, password }: FormValues) {
     setError(null)
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password })
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
     if (authError) { setError(t('auth.login.invalidCredentials')); return }
 
+    // Read role from the profiles table (source of truth) not from JWT metadata,
+    // because admin accounts are often created directly in Supabase without metadata.
     await refreshProfile()
-    const role = data.user?.user_metadata?.role
-    if (role === 'vendedor') navigate('/vendedor')
-    else if (role === 'administrador') navigate('/admin')
-    else navigate('/app')
+    setLoginAttempted(true)
   }
+
+  // Navigate once profile is loaded after a login attempt.
+  // Using the DB role ensures admins created without metadata are redirected correctly.
+  useEffect(() => {
+    if (!loginAttempted || !profile) return
+    if (profile.role === 'administrador') navigate('/admin', { replace: true })
+    else if (profile.role === 'vendedor') navigate('/vendedor', { replace: true })
+    else navigate('/app', { replace: true })
+  }, [loginAttempted, profile, navigate])
 
   return (
     <div className="min-h-screen bg-sand flex flex-col items-center justify-center p-4">
@@ -66,6 +75,13 @@ export function LoginPage() {
             <Link to="/register" className="text-coral font-semibold hover:underline">{t('auth.login.createAccount')}</Link>
           </p>
         </div>
+
+        {/* Discreet vendor registration link */}
+        <p className="text-center text-xs text-gray-400 font-body mt-5">
+          <Link to="/cadastro-vendedor" className="hover:text-gray-600 transition-colors">
+            {t('auth.login.vendorRegisterLink')}
+          </Link>
+        </p>
       </div>
     </div>
   )

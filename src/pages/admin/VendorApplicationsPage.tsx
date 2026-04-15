@@ -1,0 +1,369 @@
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { supabase } from '../../lib/supabase'
+import { Button } from '../../components/ui/Button'
+import { Badge } from '../../components/ui/Badge'
+import { Spinner } from '../../components/ui/Spinner'
+import { useToast } from '../../components/ui/Toast'
+import type { VendorApplication, VendorApplicationStatus } from '../../types'
+
+/* ── Tab config ── */
+const TABS: { key: VendorApplicationStatus | 'all'; label: string }[] = [
+  { key: 'pending', label: '' },
+  { key: 'approved', label: '' },
+  { key: 'rejected', label: '' },
+]
+
+const STATUS_BADGE: Record<VendorApplicationStatus, string> = {
+  pending: 'bg-yellow-100 text-yellow-800',
+  approved: 'bg-green-100 text-green-800',
+  rejected: 'bg-red-100 text-red-800',
+}
+
+/* ── Document link ── */
+function DocLink({ url, label }: { url: string | null; label: string }) {
+  if (!url) return <span className="text-xs text-gray-400 font-body">—</span>
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 text-xs font-semibold text-ocean hover:underline font-body"
+    >
+      <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+      </svg>
+      {label}
+    </a>
+  )
+}
+
+/* ── Reject modal ── */
+function RejectModal({
+  onConfirm,
+  onCancel,
+  loading,
+}: {
+  onConfirm: (reason: string) => void
+  onCancel: () => void
+  loading: boolean
+}) {
+  const { t } = useTranslation()
+  const [reason, setReason] = useState('')
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-4">
+        <h3 className="font-display text-lg font-semibold text-gray-900">
+          {t('admin.rejectAction')}
+        </h3>
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-semibold text-gray-700 font-body">
+            {t('admin.rejectReason')}
+          </label>
+          <textarea
+            rows={4}
+            value={reason}
+            onChange={e => setReason(e.target.value)}
+            placeholder={t('admin.rejectReasonPlaceholder')}
+            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral resize-none"
+          />
+        </div>
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            {t('common.cancel')}
+          </button>
+          <Button
+            size="sm"
+            variant="danger"
+            loading={loading}
+            disabled={!reason.trim()}
+            onClick={() => onConfirm(reason.trim())}
+          >
+            {t('admin.confirmReject')}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Application card ── */
+function ApplicationCard({
+  app,
+  onApprove,
+  onReject,
+}: {
+  app: VendorApplication
+  onApprove: (app: VendorApplication) => void
+  onReject: (app: VendorApplication) => void
+}) {
+  const { t } = useTranslation()
+  const [expanded, setExpanded] = useState(false)
+  const isPending = app.status === 'pending'
+
+  const createdAt = new Date(app.created_at).toLocaleDateString('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+  })
+
+  return (
+    <div className="bg-white rounded-2xl border border-sand-200 overflow-hidden">
+      {/* Header row */}
+      <button
+        type="button"
+        onClick={() => setExpanded(v => !v)}
+        className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-sand-50 transition-colors"
+      >
+        {/* Photo */}
+        {app.profile_photo_url ? (
+          <img
+            src={app.profile_photo_url}
+            alt=""
+            className="w-11 h-11 rounded-xl object-cover shrink-0"
+          />
+        ) : (
+          <div className="w-11 h-11 rounded-xl bg-sand-100 flex items-center justify-center text-xl shrink-0">
+            🙋
+          </div>
+        )}
+
+        <div className="flex-1 min-w-0">
+          <p className="font-display font-semibold text-gray-900 truncate">{app.full_name}</p>
+          <p className="text-xs text-gray-500 font-body truncate">{app.email} · {createdAt}</p>
+        </div>
+
+        <Badge className={STATUS_BADGE[app.status]}>
+          {t(`admin.status_${app.status}`)}
+        </Badge>
+
+        <svg
+          className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="border-t border-sand-100 px-4 pb-5 pt-4 flex flex-col gap-4">
+
+          {/* Grid of info fields */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+            <div>
+              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.cpf')}</p>
+              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">{app.cpf}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.phone')}</p>
+              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">{app.phone}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.vendorType')}</p>
+              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">
+                {t(`vendorRegister.${app.vendor_type}`)}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.modules')}</p>
+              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">
+                {app.modules.sort((a, b) => a - b).join(', ')}
+              </p>
+            </div>
+          </div>
+
+          {/* Products description */}
+          <div>
+            <p className="text-xs text-gray-400 font-body uppercase tracking-wide mb-1">
+              {t('vendorRegister.productsDescription')}
+            </p>
+            <p className="font-body text-sm text-gray-700 leading-relaxed">{app.products_description}</p>
+          </div>
+
+          {/* Documents */}
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.documents')}</p>
+            <div className="flex flex-wrap gap-3">
+              <DocLink url={app.profile_photo_url} label={t('vendorRegister.profilePhoto')} />
+              <DocLink url={app.authorization_doc_url} label={t('vendorRegister.authorizationDoc')} />
+              <DocLink url={app.identity_doc_url} label={t('vendorRegister.identityDoc')} />
+            </div>
+          </div>
+
+          {/* Rejection reason (if rejected) */}
+          {app.status === 'rejected' && app.rejection_reason && (
+            <div className="bg-red-50 rounded-xl p-3">
+              <p className="text-xs text-red-500 font-body uppercase tracking-wide mb-1">
+                {t('admin.rejectReason')}
+              </p>
+              <p className="text-sm text-red-800 font-body">{app.rejection_reason}</p>
+            </div>
+          )}
+
+          {/* Actions */}
+          {isPending && (
+            <div className="flex gap-2 pt-1">
+              <Button size="sm" variant="secondary" onClick={() => onApprove(app)}>
+                ✓ {t('admin.approveAction')}
+              </Button>
+              <Button size="sm" variant="danger" onClick={() => onReject(app)}>
+                ✕ {t('admin.rejectAction')}
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ═══════════════════════════════════════════════════════════ */
+export function VendorApplicationsPage() {
+  const { t } = useTranslation()
+  const toast = useToast()
+
+  const [applications, setApplications] = useState<VendorApplication[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<VendorApplicationStatus>('pending')
+
+  const [rejectTarget, setRejectTarget] = useState<VendorApplication | null>(null)
+  const [actionLoading, setActionLoading] = useState(false)
+
+  async function fetchApplications() {
+    setLoading(true)
+    const { data } = await supabase
+      .from('vendor_applications')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (data) setApplications(data as VendorApplication[])
+    setLoading(false)
+  }
+
+  useEffect(() => { fetchApplications() }, [])
+
+  async function handleApprove(app: VendorApplication) {
+    setActionLoading(true)
+
+    // 1. Mark application as approved
+    const { error: appError } = await supabase
+      .from('vendor_applications')
+      .update({ status: 'approved', reviewed_at: new Date().toISOString() })
+      .eq('id', app.id)
+
+    // 2. Approve vendor row if profile is linked
+    if (!appError && app.applicant_profile_id) {
+      await supabase
+        .from('vendors')
+        .update({ is_approved: true })
+        .eq('profile_id', app.applicant_profile_id)
+    }
+
+    if (appError) {
+      toast(t('admin.vendorUpdateError'), 'error')
+    } else {
+      toast(t('admin.approveSuccess'), 'success')
+      setApplications(prev =>
+        prev.map(a => a.id === app.id ? { ...a, status: 'approved', reviewed_at: new Date().toISOString() } : a),
+      )
+    }
+    setActionLoading(false)
+  }
+
+  async function handleReject(app: VendorApplication, reason: string) {
+    setActionLoading(true)
+    const { error } = await supabase
+      .from('vendor_applications')
+      .update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() })
+      .eq('id', app.id)
+
+    if (error) {
+      toast(t('admin.vendorUpdateError'), 'error')
+    } else {
+      toast(t('admin.rejectSuccess'), 'success')
+      setApplications(prev =>
+        prev.map(a => a.id === app.id
+          ? { ...a, status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() }
+          : a,
+        ),
+      )
+    }
+    setRejectTarget(null)
+    setActionLoading(false)
+  }
+
+  const filtered = applications.filter(a => a.status === activeTab)
+
+  const counts = {
+    pending: applications.filter(a => a.status === 'pending').length,
+    approved: applications.filter(a => a.status === 'approved').length,
+    rejected: applications.filter(a => a.status === 'rejected').length,
+  }
+
+  return (
+    <div className="p-6 max-w-3xl mx-auto">
+      <div className="mb-6">
+        <h1 className="font-display text-3xl font-bold text-gray-900">{t('admin.applicationsTitle')}</h1>
+        <p className="font-body text-sm text-gray-500 mt-1">{t('admin.applicationsSubtitle')}</p>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-sand-100 rounded-xl p-1 mb-5">
+        {(['pending', 'approved', 'rejected'] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 py-2 rounded-lg font-body text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 ${
+              activeTab === tab
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            {t(`admin.tab_${tab}`)}
+            {counts[tab] > 0 && (
+              <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${
+                tab === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                tab === 'approved' ? 'bg-green-100 text-green-700' :
+                'bg-red-100 text-red-700'
+              }`}>
+                {counts[tab]}
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
+
+      {/* Content */}
+      {loading ? (
+        <div className="flex justify-center py-16"><Spinner size="lg" /></div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-16">
+          <p className="text-4xl mb-3">📋</p>
+          <p className="text-gray-500 font-body">{t('admin.noApplications')}</p>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-3">
+          {filtered.map(app => (
+            <ApplicationCard
+              key={app.id}
+              app={app}
+              onApprove={handleApprove}
+              onReject={setRejectTarget}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Reject modal */}
+      {rejectTarget && (
+        <RejectModal
+          loading={actionLoading}
+          onConfirm={reason => handleReject(rejectTarget, reason)}
+          onCancel={() => setRejectTarget(null)}
+        />
+      )}
+    </div>
+  )
+}
