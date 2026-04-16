@@ -113,6 +113,8 @@
     "notesLabel": "Notes (optional)",
     "notesPlaceholder": "No ice, extra lemon...",
     "placeOrder": "Place order · R$",
+    "paymentMethod": "Payment method",
+    "paymentRequired": "Please select a payment method",
     "orderError": "Error placing order. Please try again.",
     "orderSuccess": "Order placed! The vendor will confirm shortly.",
     "clearCartTooltip": "Clear cart to buy from another vendor"

@@ -113,6 +113,8 @@
     "notesLabel": "Observações (opcional)",
     "notesPlaceholder": "Sem gelo, extra limão...",
     "placeOrder": "Fazer pedido · R$",
+    "paymentMethod": "Forma de pagamento",
+    "paymentRequired": "Selecione a forma de pagamento",
     "orderError": "Erro ao fazer pedido. Tente novamente.",
     "orderSuccess": "Pedido feito! O vendedor vai confirmar em breve.",
     "clearCartTooltip": "Limpe o carrinho para comprar de outro vendedor"

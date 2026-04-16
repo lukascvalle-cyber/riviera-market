@@ -113,6 +113,8 @@
     "notesLabel": "Observaciones (opcional)",
     "notesPlaceholder": "Sin hielo, extra limón...",
     "placeOrder": "Hacer pedido · R$",
+    "paymentMethod": "Método de pago",
+    "paymentRequired": "Selecciona el método de pago",
     "orderError": "Error al hacer el pedido. Inténtalo de nuevo.",
     "orderSuccess": "¡Pedido realizado! El vendedor confirmará pronto.",
     "clearCartTooltip": "Vacía el carrito para comprar a otro vendedor"

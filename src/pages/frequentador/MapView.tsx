@@ -23,43 +23,67 @@ const SIMULATED_VENDOR_LOCATION: Record<string, [number, number]> = {
 
 /* ── Product card ── */
 function ProductCard({ product }: { product: Product }) {
-  const { addItem, vendorId: cartVendorId } = useCart()
+  const { addItem, updateQuantity, items, vendorId: cartVendorId } = useCart()
   const { t } = useTranslation()
   const canAdd = cartVendorId === null || cartVendorId === product.vendor_id
+  const qty = items.find(i => i.product.id === product.id)?.quantity ?? 0
 
   return (
-    <div className="bg-sand-50 rounded-2xl p-4 flex gap-3">
+    <div className="bg-white rounded-2xl p-4 flex gap-3 border border-gray-100 shadow-sm">
       {product.photo_url && (
         <img
           src={product.photo_url}
           alt={product.name}
-          className="w-16 h-16 rounded-xl object-cover shrink-0"
+          className="w-20 h-20 rounded-xl object-cover shrink-0"
         />
       )}
       <div className="flex-1 min-w-0 flex flex-col gap-1">
-        <div className="flex items-start justify-between gap-2">
-          <p className="font-body font-semibold text-gray-900">{product.name}</p>
-          <p className="font-body font-bold text-coral shrink-0">
-            R${' '}{product.price_brl.toFixed(2).replace('.', ',')}
-          </p>
-        </div>
+        <p className="font-body font-semibold text-gray-900 text-[15px] leading-snug">
+          {product.name}
+        </p>
         {product.description && (
-          <p className="font-body text-xs text-gray-500 leading-relaxed">
+          <p className="font-body text-xs text-gray-400 leading-relaxed line-clamp-2">
             {product.description}
           </p>
         )}
-        <button
-          onClick={() => canAdd && addItem(product)}
-          disabled={!canAdd}
-          title={!canAdd ? t('cart.clearCartTooltip') : undefined}
-          className={`mt-1.5 self-start px-4 py-1.5 rounded-xl text-xs font-semibold font-body transition-colors ${
-            canAdd
-              ? 'bg-coral text-white hover:bg-coral/90'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {canAdd ? `+ ${t('vendor.add').replace('+ ', '')}` : '—'}
-        </button>
+        <div className="flex items-center justify-between mt-auto pt-2">
+          <p className="font-body font-bold text-green-600 text-base">
+            R${' '}{product.price_brl.toFixed(2).replace('.', ',')}
+          </p>
+
+          {qty === 0 ? (
+            <button
+              onClick={() => canAdd && addItem(product)}
+              disabled={!canAdd}
+              title={!canAdd ? t('cart.clearCartTooltip') : undefined}
+              className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-bold transition-colors ${
+                canAdd
+                  ? 'bg-coral text-white hover:bg-coral/90'
+                  : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+              }`}
+            >
+              +
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => updateQuantity(product.id, qty - 1)}
+                className="w-8 h-8 rounded-full bg-coral/10 text-coral flex items-center justify-center font-bold text-lg hover:bg-coral/20 transition-colors"
+              >
+                −
+              </button>
+              <span className="w-5 text-center font-body font-bold text-gray-900 text-sm">
+                {qty}
+              </span>
+              <button
+                onClick={() => addItem(product)}
+                className="w-8 h-8 rounded-full bg-coral text-white flex items-center justify-center font-bold text-lg hover:bg-coral/90 transition-colors"
+              >
+                +
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -70,7 +94,7 @@ export function MapView() {
   const mapRef = useRef<BeachMapHandle>(null)
   const [map, setMap] = useState<MapboxMap | null>(null)
   const { vendors: activeVendors, loading: mapLoading } = useVendorLocation()
-  const { itemCount } = useCart()
+  const { itemCount, total } = useCart()
   const { t } = useTranslation()
 
   // All approved vendors for the bottom sheet
@@ -226,19 +250,22 @@ export function MapView() {
         </div>
       </div>
 
-      {/* ── Cart FAB ── */}
-      <button
-        onClick={() => setCartOpen(true)}
-        className="absolute top-4 right-4 bg-coral text-white w-12 h-12 rounded-full shadow-lg flex items-center justify-center hover:bg-coral/90 transition-colors z-10"
-        aria-label={t('map.viewCart')}
-      >
-        <span className="text-xl">🛒</span>
-        {itemCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-ocean text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+      {/* ── Floating cart bar (iFood-style) ── */}
+      {itemCount > 0 && (
+        <button
+          onClick={() => setCartOpen(true)}
+          className="absolute left-1/2 -translate-x-1/2 z-[22] bg-coral text-white rounded-full shadow-xl flex items-center gap-3 font-body font-semibold text-sm whitespace-nowrap transition-all duration-200"
+          style={{ bottom: `${PEEK_PX + 12}px`, padding: '12px 20px' }}
+          aria-label={t('map.viewCart')}
+        >
+          <span className="bg-white/25 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0">
             {itemCount}
           </span>
-        )}
-      </button>
+          <span>{t('cart.title')}</span>
+          <span className="opacity-60 mx-0.5">·</span>
+          <span>R${' '}{total.toFixed(2).replace('.', ',')}</span>
+        </button>
+      )}
 
       {/* ── Bottom sheet ── */}
       <div
@@ -361,9 +388,12 @@ export function MapView() {
               {CATEGORY_EMOJI[selectedVendor.category]}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="font-display font-bold text-gray-900 text-lg leading-tight truncate">
-                {selectedVendor.display_name}
-              </h2>
+              <div className="flex items-center gap-2">
+                <h2 className="font-display font-bold text-gray-900 text-lg leading-tight truncate">
+                  {selectedVendor.display_name}
+                </h2>
+                <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+              </div>
               <p className="text-xs text-gray-400 font-body">
                 {t(`categories.${selectedVendor.category}`)}
               </p>
@@ -393,6 +423,9 @@ export function MapView() {
               ))
             )}
           </div>
+
+          {/* Safe area spacer */}
+          <div className="shrink-0" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
         </div>
       )}
 

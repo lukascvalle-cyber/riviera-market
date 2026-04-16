@@ -26,16 +26,27 @@ export function VendorPin({ map, vendor, onClick }: VendorPinProps) {
     const el = document.createElement('div')
     el.className = 'vendor-pin'
     el.style.cssText = `
-      width: 44px; height: 44px; border-radius: 50%;
+      width: 38px; height: 38px; border-radius: 50%;
       background: ${CATEGORY_COLORS[vendor.category]};
-      border: 3px solid white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      border: 2px solid white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.30);
       display: flex; align-items: center; justify-content: center;
-      font-size: 20px; cursor: pointer;
+      font-size: 18px; cursor: pointer;
+      position: relative;
       transition: transform 0.15s ease;
     `
     el.textContent = CATEGORY_EMOJI[vendor.category]
     el.title = vendor.display_name
+
+    // Online status dot
+    const dot = document.createElement('span')
+    dot.style.cssText = `
+      position: absolute; bottom: 0; right: 0;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #22c55e; border: 1.5px solid white;
+    `
+    el.appendChild(dot)
+
     el.addEventListener('mouseenter', () => { el.style.transform = 'scale(1.15)' })
     el.addEventListener('mouseleave', () => { el.style.transform = 'scale(1)' })
     // Use refs so click always passes the latest vendor object

@@ -54,6 +54,7 @@ export function useOrders(mode: 'frequentador' | 'vendedor', id: string | null) 
     moduleNumber: number,
     buildingName: string | null,
     apartmentNumber: string | null,
+    paymentMethod: string,
     notes?: string,
   ) {
     const total = items.reduce((s, i) => s + i.product.price_brl * i.quantity, 0)
@@ -86,7 +87,12 @@ export function useOrders(mode: 'frequentador' | 'vendedor', id: string | null) 
     if (data) {
       await supabase
         .from('orders')
-        .update({ module_number: moduleNumber, building_name: buildingName, apartment_number: apartmentNumber })
+        .update({
+          module_number: moduleNumber,
+          building_name: buildingName,
+          apartment_number: apartmentNumber,
+          payment_method: paymentMethod,
+        })
         .eq('id', data)
     }
 

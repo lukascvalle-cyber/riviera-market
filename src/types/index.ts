@@ -88,6 +88,7 @@ export interface Order {
   module_number: number | null
   building_name: string | null
   apartment_number: string | null
+  payment_method: string | null
   total_brl: number
   notes: string | null
   created_at: string
