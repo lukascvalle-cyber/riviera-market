@@ -20,32 +20,37 @@ export function FrequentadorApp() {
   useEffect(() => {
     if (!user?.id) return
 
-    const channel = supabase
-      .channel('order-status-buyer')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'orders',
-          filter: `frequentador_id=eq.${user.id}`,
-        },
-        (payload) => {
-          const { status } = payload.new as { status: string }
-          if (status === 'confirmed') {
-            toast('✅ Pedido aceite! O vendedor está a caminho.', 'success')
-          } else if (status === 'delivering') {
-            toast('🏃 O vendedor está a caminho!', 'info')
-          } else if (status === 'cancelled') {
-            toast('❌ Vendedor indisponível. Tente novamente.', 'error')
-          } else if (status === 'delivered') {
-            toast('🎉 Pedido entregue! Bom proveito.', 'success')
-          }
-        },
-      )
-      .subscribe()
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel(`order-status-buyer-${user.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'orders',
+            filter: `frequentador_id=eq.${user.id}`,
+          },
+          (payload) => {
+            const { status } = payload.new as { status: string }
+            if (status === 'confirmed') {
+              toast('✅ Pedido aceite! O vendedor está a caminho.', 'success')
+            } else if (status === 'delivering') {
+              toast('🏃 O vendedor está a caminho!', 'info')
+            } else if (status === 'cancelled') {
+              toast('❌ Vendedor indisponível. Tente novamente.', 'error')
+            } else if (status === 'delivered') {
+              toast('🎉 Pedido entregue! Bom proveito.', 'success')
+            }
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[order-status-buyer] Realtime subscription error:', err)
+    }
 
-    return () => { supabase.removeChannel(channel) }
+    return () => { if (channel) supabase.removeChannel(channel) }
   }, [user?.id, toast])
 
   return (

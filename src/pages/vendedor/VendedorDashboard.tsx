@@ -36,6 +36,10 @@ export function VendedorDashboard() {
   const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status))
   const pastOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.status)).slice(0, 10)
 
+  // Ref for active order IDs — avoids `activeOrders` as an effect dependency (new ref every render)
+  const activeOrderIdsRef = useRef<string[]>([])
+  activeOrderIdsRef.current = activeOrders.map(o => o.id)
+
   const handleStatusUpdate = useCallback(
     async (orderId: string, status: OrderStatus) => {
       const ok = await updateStatus(orderId, status)
@@ -58,23 +62,28 @@ export function VendedorDashboard() {
   // ── New order notification channel ──
   useEffect(() => {
     if (!vendor?.id) return
-    const channel = supabase
-      .channel('new-order-alert')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'orders',
-          filter: `vendor_id=eq.${vendor.id}`,
-        },
-        (payload) => {
-          setNewOrderAlert(payload.new as Order)
-          setCountdown(60)
-        },
-      )
-      .subscribe()
-    return () => { supabase.removeChannel(channel) }
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel(`new-order-alert-${vendor.id}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'orders',
+            filter: `vendor_id=eq.${vendor.id}`,
+          },
+          (payload) => {
+            setNewOrderAlert(payload.new as Order)
+            setCountdown(60)
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[new-order-alert] Realtime subscription error:', err)
+    }
+    return () => { if (channel) supabase.removeChannel(channel) }
   }, [vendor?.id])
 
   // ── Countdown auto-dismiss ──
@@ -98,37 +107,41 @@ export function VendedorDashboard() {
   }, [newOrderAlert?.id])
 
   // ── Message subscription for unread badges + toasts ──
+  // Uses activeOrderIdsRef so we don't re-subscribe every time the orders array changes.
   useEffect(() => {
     if (!user?.id) return
-    const activeIds = activeOrders.map(o => o.id)
-    if (activeIds.length === 0) return
 
-    const channel = supabase
-      .channel('vendor-messages')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'order_messages' },
-        (payload) => {
-          const msg = payload.new as OrderMessage
-          if (!activeIds.includes(msg.order_id)) return
-          if (msg.sender_id === user.id) return
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel(`vendor-messages-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'order_messages' },
+          (payload) => {
+            const msg = payload.new as OrderMessage
+            if (!activeOrderIdsRef.current.includes(msg.order_id)) return
+            if (msg.sender_id === user.id) return
 
-          if (chatOrderIdRef.current === msg.order_id) return
+            if (chatOrderIdRef.current === msg.order_id) return
 
-          setUnreadCounts(prev => ({
-            ...prev,
-            [msg.order_id]: (prev[msg.order_id] ?? 0) + 1,
-          }))
-          toast(
-            `💬 Cliente: ${msg.message.length > 40 ? msg.message.slice(0, 40) + '…' : msg.message}`,
-            'info',
-          )
-        },
-      )
-      .subscribe()
+            setUnreadCounts(prev => ({
+              ...prev,
+              [msg.order_id]: (prev[msg.order_id] ?? 0) + 1,
+            }))
+            toast(
+              `💬 Cliente: ${msg.message.length > 40 ? msg.message.slice(0, 40) + '…' : msg.message}`,
+              'info',
+            )
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[vendor-messages] Realtime subscription error:', err)
+    }
 
-    return () => { supabase.removeChannel(channel) }
-  }, [activeOrders, user?.id, toast])
+    return () => { if (channel) supabase.removeChannel(channel) }
+  }, [user?.id, toast])
 
   const chatOrder = orders.find(o => o.id === chatOrderId)
 

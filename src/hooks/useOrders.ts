@@ -36,16 +36,21 @@ export function useOrders(mode: 'frequentador' | 'vendedor', id: string | null) 
       ? `vendor_id=eq.${id}`
       : `frequentador_id=eq.${id}`
 
-    const channel = supabase
-      .channel(`orders-${mode}-${id}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'orders', filter },
-        () => { fetchOrders() },
-      )
-      .subscribe()
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel(`orders-${mode}-${id}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'orders', filter },
+          () => { fetchOrders() },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[useOrders] Realtime subscription error:', err)
+    }
 
-    return () => { supabase.removeChannel(channel) }
+    return () => { if (channel) supabase.removeChannel(channel) }
   }, [id, mode, fetchOrders])
 
   async function createOrder(

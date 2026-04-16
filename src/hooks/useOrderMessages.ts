@@ -24,28 +24,34 @@ export function useOrderMessages(orderId: string | null, currentUserId: string |
   // Realtime — only subscribes when orderId is set
   useEffect(() => {
     if (!orderId) return
-    const channel = supabase
-      .channel(`chat-${orderId}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'order_messages',
-          filter: `order_id=eq.${orderId}`,
-        },
-        (payload) => {
-          setMessages(prev => {
-            const msg = payload.new as OrderMessage
-            // Deduplicate in case the insert is reflected back to the sender
-            if (prev.some(m => m.id === msg.id)) return prev
-            return [...prev, msg]
-          })
-        },
-      )
-      .subscribe()
 
-    return () => { supabase.removeChannel(channel) }
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel(`chat-${orderId}`)
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'order_messages',
+            filter: `order_id=eq.${orderId}`,
+          },
+          (payload) => {
+            setMessages(prev => {
+              const msg = payload.new as OrderMessage
+              // Deduplicate in case the insert is reflected back to the sender
+              if (prev.some(m => m.id === msg.id)) return prev
+              return [...prev, msg]
+            })
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[useOrderMessages] Realtime subscription error:', err)
+    }
+
+    return () => { if (channel) supabase.removeChannel(channel) }
   }, [orderId])
 
   const sendMessage = useCallback(

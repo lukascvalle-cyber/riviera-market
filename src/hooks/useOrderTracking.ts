@@ -33,17 +33,22 @@ export function useOrderTracking(orderId: string | null) {
   // Realtime: order status changes (e.g. vendor confirms, starts delivering, marks delivered)
   useEffect(() => {
     if (!orderId) return
-    const ch = supabase
-      .channel(`order-track-status-${orderId}`)
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
-        (payload) => {
-          setOrder(prev => prev ? { ...prev, ...(payload.new as Partial<Order>) } : null)
-        },
-      )
-      .subscribe()
-    return () => { supabase.removeChannel(ch) }
+    let ch: ReturnType<typeof supabase.channel> | null = null
+    try {
+      ch = supabase
+        .channel(`order-track-status-${orderId}`)
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'orders', filter: `id=eq.${orderId}` },
+          (payload) => {
+            setOrder(prev => prev ? { ...prev, ...(payload.new as Partial<Order>) } : null)
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[useOrderTracking] status subscription error:', err)
+    }
+    return () => { if (ch) supabase.removeChannel(ch) }
   }, [orderId])
 
   // Realtime: vendor GPS position updates (starts after we know the vendor_id)
@@ -51,20 +56,25 @@ export function useOrderTracking(orderId: string | null) {
     if (!order?.vendor_id) return
     const vendorId = order.vendor_id
 
-    const ch = supabase
-      .channel(`order-track-loc-${vendorId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'vendor_locations', filter: `vendor_id=eq.${vendorId}` },
-        (payload) => {
-          if (payload.new && Object.keys(payload.new).length > 0) {
-            setVendorLocation(payload.new as VendorLocation)
-          }
-        },
-      )
-      .subscribe()
+    let ch: ReturnType<typeof supabase.channel> | null = null
+    try {
+      ch = supabase
+        .channel(`order-track-loc-${vendorId}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'vendor_locations', filter: `vendor_id=eq.${vendorId}` },
+          (payload) => {
+            if (payload.new && Object.keys(payload.new).length > 0) {
+              setVendorLocation(payload.new as VendorLocation)
+            }
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[useOrderTracking] location subscription error:', err)
+    }
 
-    return () => { supabase.removeChannel(ch) }
+    return () => { if (ch) supabase.removeChannel(ch) }
   }, [order?.vendor_id])
 
   return { order, vendorLocation, loading }

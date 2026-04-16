@@ -24,6 +24,12 @@ export function MyOrdersPage() {
   const chatOrderIdRef = useRef<string | null>(null)
   chatOrderIdRef.current = chatOrderId
 
+  // Ref for active order IDs — updated every render, avoids `orders` as an effect dependency
+  const activeIdsRef = useRef<string[]>([])
+  activeIdsRef.current = orders
+    .filter(o => !['delivered', 'cancelled'].includes(o.status))
+    .map(o => o.id)
+
   const handleTrack = useCallback((orderId: string) => {
     navigate(`/app/rastreamento/${orderId}`)
   }, [navigate])
@@ -33,41 +39,43 @@ export function MyOrdersPage() {
     setUnreadCounts(prev => ({ ...prev, [orderId]: 0 }))
   }
 
-  // Subscribe to new messages for all active orders — shows toasts and increments unread badges
+  // Subscribe to new messages for all active orders — shows toasts and increments unread badges.
+  // Uses activeIdsRef so we don't re-subscribe every time the orders array reference changes.
   useEffect(() => {
     if (!user?.id) return
-    const activeIds = orders
-      .filter(o => !['delivered', 'cancelled'].includes(o.status))
-      .map(o => o.id)
-    if (activeIds.length === 0) return
 
-    const channel = supabase
-      .channel('buyer-messages')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'order_messages' },
-        (payload) => {
-          const msg = payload.new as OrderMessage
-          // Ignore messages not in our active orders, or sent by us
-          if (!activeIds.includes(msg.order_id)) return
-          if (msg.sender_id === user.id) return
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel(`buyer-messages-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'order_messages' },
+          (payload) => {
+            const msg = payload.new as OrderMessage
+            // Ignore messages not in our active orders, or sent by us
+            if (!activeIdsRef.current.includes(msg.order_id)) return
+            if (msg.sender_id === user.id) return
 
-          if (chatOrderIdRef.current === msg.order_id) {
-            // Chat is open — OrderChat handles display, no badge needed
-            return
-          }
-          // Chat is closed — increment badge and show toast
-          setUnreadCounts(prev => ({
-            ...prev,
-            [msg.order_id]: (prev[msg.order_id] ?? 0) + 1,
-          }))
-          toast(`💬 ${msg.message.length > 40 ? msg.message.slice(0, 40) + '…' : msg.message}`, 'info')
-        },
-      )
-      .subscribe()
+            if (chatOrderIdRef.current === msg.order_id) {
+              // Chat is open — OrderChat handles display, no badge needed
+              return
+            }
+            // Chat is closed — increment badge and show toast
+            setUnreadCounts(prev => ({
+              ...prev,
+              [msg.order_id]: (prev[msg.order_id] ?? 0) + 1,
+            }))
+            toast(`💬 ${msg.message.length > 40 ? msg.message.slice(0, 40) + '…' : msg.message}`, 'info')
+          },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[buyer-messages] Realtime subscription error:', err)
+    }
 
-    return () => { supabase.removeChannel(channel) }
-  }, [orders, user?.id, toast])
+    return () => { if (channel) supabase.removeChannel(channel) }
+  }, [user?.id, toast])
 
   const chatOrder = orders.find(o => o.id === chatOrderId)
 

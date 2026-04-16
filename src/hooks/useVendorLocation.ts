@@ -34,41 +34,46 @@ export function useVendorLocation() {
   useEffect(() => {
     fetchActiveVendors()
 
-    const channel = supabase
-      .channel('vendor-locations')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'vendor_locations' },
-        (payload) => {
-          // New vendor came online — full refetch to add them to the list
-          fetchActiveVendors()
-          void payload
-        },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'vendor_locations' },
-        (payload) => {
-          // Vendor moved — update only that vendor's location in-place (no refetch)
-          const loc = payload.new as VendorLocation
-          setVendors(prev =>
-            prev.map(v => v.id === loc.vendor_id ? { ...v, location: loc } : v),
-          )
-        },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'vendor_locations' },
-        () => { fetchActiveVendors() },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'vendors' },
-        () => { fetchActiveVendors() },
-      )
-      .subscribe()
+    let channel: ReturnType<typeof supabase.channel> | null = null
+    try {
+      channel = supabase
+        .channel('vendor-locations')
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'vendor_locations' },
+          (payload) => {
+            // New vendor came online — full refetch to add them to the list
+            fetchActiveVendors()
+            void payload
+          },
+        )
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'vendor_locations' },
+          (payload) => {
+            // Vendor moved — update only that vendor's location in-place (no refetch)
+            const loc = payload.new as VendorLocation
+            setVendors(prev =>
+              prev.map(v => v.id === loc.vendor_id ? { ...v, location: loc } : v),
+            )
+          },
+        )
+        .on(
+          'postgres_changes',
+          { event: 'DELETE', schema: 'public', table: 'vendor_locations' },
+          () => { fetchActiveVendors() },
+        )
+        .on(
+          'postgres_changes',
+          { event: 'UPDATE', schema: 'public', table: 'vendors' },
+          () => { fetchActiveVendors() },
+        )
+        .subscribe()
+    } catch (err) {
+      console.error('[useVendorLocation] Realtime subscription error:', err)
+    }
 
-    return () => { supabase.removeChannel(channel) }
+    return () => { if (channel) supabase.removeChannel(channel) }
   }, [fetchActiveVendors])
 
   return { vendors, loading, refresh: fetchActiveVendors }
