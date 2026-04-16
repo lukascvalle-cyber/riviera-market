@@ -384,6 +384,57 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
             'text-halo-width': 2,
           },
         })
+
+        // ── Módulo 2 ──
+        map.addSource('modulo-2', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 2' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.030705161111854, -23.807425161614816],
+                [-46.03100053932371, -23.8075284900481],
+                [-46.0331376875651, -23.808537925028944],
+                [-46.03530089858904, -23.809626834281502],
+                [-46.033884820689536, -23.811542338616604],
+                [-46.02944545991309, -23.809245319670623],
+                [-46.030705161111854, -23.807425161614816],
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-2-fill',
+          type: 'fill',
+          source: 'modulo-2',
+          paint: { 'fill-color': '#0ea5e9', 'fill-opacity': 0.15 },
+        })
+
+        map.addLayer({
+          id: 'modulo-2-outline',
+          type: 'line',
+          source: 'modulo-2',
+          paint: { 'line-color': '#0ea5e9', 'line-width': 2 },
+        })
+
+        map.addLayer({
+          id: 'modulo-2-label',
+          type: 'symbol',
+          source: 'modulo-2',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
       })
 
       mapRef.current = map
