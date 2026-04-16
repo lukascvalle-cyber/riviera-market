@@ -8,7 +8,9 @@
       "Bash(npm run *)",
       "Bash(node -e \"const p=require\\('./node_modules/i18next-browser-languagedetector/package.json'\\); console.log\\('detector', p.version\\)\")",
       "Bash(node -e \"const t=require\\('./node_modules/i18next-browser-languagedetector/dist/commonjs/i18nextBrowserLanguageDetector.js'\\); console.log\\(Object.keys\\(t\\)\\)\")",
-      "Bash(node -e \"console.log\\(require\\('./node_modules/i18next/package.json'\\).version\\)\")"
+      "Bash(node -e \"console.log\\(require\\('./node_modules/i18next/package.json'\\).version\\)\")",
+      "WebFetch(domain:overpass-api.de)",
+      "WebFetch(domain:api.mapbox.com)"
     ]
   }
 }

@@ -51,10 +51,20 @@ export function useOrders(mode: 'frequentador' | 'vendedor', id: string | null) 
   async function createOrder(
     vendorId: string,
     items: CartItem[],
-    deliveryLocation: string,
+    moduleNumber: number,
+    buildingName: string | null,
+    apartmentNumber: string | null,
     notes?: string,
   ) {
     const total = items.reduce((s, i) => s + i.product.price_brl * i.quantity, 0)
+
+    // Build a human-readable delivery location string for legacy display
+    const locationParts = [
+      `Módulo ${moduleNumber}`,
+      buildingName ?? null,
+      apartmentNumber ?? null,
+    ].filter(Boolean) as string[]
+    const deliveryLocation = locationParts.join(' – ')
 
     // Insert order atomically via RPC
     const { data, error } = await supabase.rpc('create_order', {
@@ -71,6 +81,15 @@ export function useOrders(mode: 'frequentador' | 'vendedor', id: string | null) 
     })
 
     if (error) return { data: null, error }
+
+    // Persist structured location fields
+    if (data) {
+      await supabase
+        .from('orders')
+        .update({ module_number: moduleNumber, building_name: buildingName, apartment_number: apartmentNumber })
+        .eq('id', data)
+    }
+
     await fetchOrders()
     return { data, error: null }
   }

@@ -85,6 +85,9 @@ export interface Order {
   frequentador_id: string
   status: OrderStatus
   delivery_location: string | null
+  module_number: number | null
+  building_name: string | null
+  apartment_number: string | null
   total_brl: number
   notes: string | null
   created_at: string

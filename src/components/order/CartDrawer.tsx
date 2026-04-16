@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { supabase } from '../../lib/supabase'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrders } from '../../hooks/useOrders'
 import { Button } from '../ui/Button'
 import { useToast } from '../ui/Toast'
-import type { Module, Building } from '../../types'
+import rivieraBuildings from '../../data/riviera-buildings.json'
+
+const MODULES = [2, 3, 4, 5, 6, 7, 8]
+const buildings = rivieraBuildings as Record<string, string[]>
 
 interface CartDrawerProps {
   open: boolean
@@ -22,61 +24,47 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
   const navigate = useNavigate()
   const { createOrder } = useOrders('frequentador', user?.id ?? null)
 
-  const [modules, setModules] = useState<Module[]>([])
-  const [buildings, setBuildings] = useState<Building[]>([])
-  const [moduleId, setModuleId] = useState<number | null>(null)
-  const [buildingId, setBuildingId] = useState<number | null>(null)
-  const [spot, setSpot] = useState('')
+  const [moduleNumber, setModuleNumber] = useState<number | null>(null)
+  const [buildingName, setBuildingName] = useState('')
+  const [buildingCustom, setBuildingCustom] = useState('')
+  const [apartmentNumber, setApartmentNumber] = useState('')
   const [notes, setNotes] = useState('')
   const [placing, setPlacing] = useState(false)
 
-  // Carrega módulos quando o drawer abre
-  useEffect(() => {
-    if (!open) return
-    supabase
-      .from('modules')
-      .select('*')
-      .order('number')
-      .then(({ data }) => { if (data) setModules(data) })
-  }, [open])
-
-  // Carrega edifícios quando o módulo muda
-  useEffect(() => {
-    setBuildingId(null)
-    if (!moduleId) { setBuildings([]); return }
-    supabase
-      .from('buildings')
-      .select('*')
-      .eq('module_id', moduleId)
-      .order('name')
-      .then(({ data }) => { if (data) setBuildings(data) })
-  }, [moduleId])
-
-  // Reseta o estado de localização ao fechar
+  // Reset state when drawer closes
   useEffect(() => {
     if (!open) {
-      setModuleId(null)
-      setBuildingId(null)
-      setSpot('')
+      setModuleNumber(null)
+      setBuildingName('')
+      setBuildingCustom('')
+      setApartmentNumber('')
       setNotes('')
     }
   }, [open])
 
+  // Reset building when module changes
+  useEffect(() => {
+    setBuildingName('')
+    setBuildingCustom('')
+  }, [moduleNumber])
+
+  const buildingOptions = moduleNumber ? (buildings[String(moduleNumber)] ?? []) : []
+  const isOther = buildingName === 'Outro'
+  const resolvedBuilding = isOther ? buildingCustom.trim() : buildingName
+
   async function handlePlaceOrder() {
     if (!vendorId) return
-    if (!moduleId) { toast(t('cart.moduleRequired'), 'error'); return }
-
-    const selectedModule   = modules.find(m => m.id === moduleId)
-    const selectedBuilding = buildingId ? buildings.find(b => b.id === buildingId) : null
-    const parts = [
-      selectedModule?.name,
-      selectedBuilding?.name ?? null,
-      spot.trim() || null,
-    ].filter(Boolean) as string[]
-    const deliveryLocation = parts.join(' – ')
+    if (!moduleNumber) { toast(t('cart.moduleRequired'), 'error'); return }
 
     setPlacing(true)
-    const { data: orderId, error } = await createOrder(vendorId, items, deliveryLocation, notes || undefined)
+    const { data: orderId, error } = await createOrder(
+      vendorId,
+      items,
+      moduleNumber,
+      resolvedBuilding || null,
+      apartmentNumber.trim() || null,
+      notes || undefined,
+    )
     setPlacing(false)
     if (error) { toast(t('cart.orderError'), 'error'); return }
     clearCart()
@@ -112,7 +100,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
             <p className="text-center text-gray-400 font-body py-8">{t('cart.empty')}</p>
           ) : (
             <>
-              {/* Lista de itens */}
+              {/* Item list */}
               {items.map(item => (
                 <div key={item.product.id} className="flex items-center gap-3">
                   <div className="flex-1">
@@ -151,65 +139,72 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                 </div>
               </div>
 
-              {/* Seção de localização */}
+              {/* Location section */}
               <div className="border-t border-sand-200 pt-3 mt-1 flex flex-col gap-3">
                 <p className="text-sm font-semibold text-gray-700 font-body flex items-center gap-1.5">
                   📍 {t('cart.whereAreYou')}
                 </p>
 
-                {/* Módulo — obrigatório */}
+                {/* Módulo — required */}
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-semibold text-gray-700 font-body">
                     {t('cart.moduleLabel')} <span className="text-coral text-xs">*</span>
                   </label>
                   <select
-                    value={moduleId ?? ''}
-                    onChange={e => setModuleId(e.target.value ? Number(e.target.value) : null)}
+                    value={moduleNumber ?? ''}
+                    onChange={e => setModuleNumber(e.target.value ? Number(e.target.value) : null)}
                     className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-gray-900 focus:outline-none focus:ring-2 focus:ring-coral bg-white text-sm"
                   >
                     <option value="">{t('cart.modulePlaceholder')}</option>
-                    {modules.map(m => (
-                      <option key={m.id} value={m.id}>{m.name}</option>
+                    {MODULES.map(m => (
+                      <option key={m} value={m}>Módulo {m}</option>
                     ))}
                   </select>
                 </div>
 
-                {/* Edifício — opcional */}
+                {/* Edifício — optional */}
                 <div className="flex flex-col gap-1">
-                  <label className={`text-sm font-semibold font-body ${moduleId ? 'text-gray-700' : 'text-gray-400'}`}>
+                  <label className={`text-sm font-semibold font-body ${moduleNumber ? 'text-gray-700' : 'text-gray-400'}`}>
                     {t('cart.buildingLabel')}
                   </label>
                   <select
-                    value={buildingId ?? ''}
-                    onChange={e => setBuildingId(e.target.value ? Number(e.target.value) : null)}
-                    disabled={!moduleId}
+                    value={buildingName}
+                    onChange={e => setBuildingName(e.target.value)}
+                    disabled={!moduleNumber}
                     className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-gray-900 focus:outline-none focus:ring-2 focus:ring-coral bg-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <option value="">
-                      {moduleId ? t('cart.buildingPlaceholder') : t('cart.buildingDisabled')}
-                    </option>
-                    {buildings.map(b => (
-                      <option key={b.id} value={b.id}>{b.name}</option>
+                    <option value="">{t('cart.buildingPlaceholder')}</option>
+                    {buildingOptions.map(b => (
+                      <option key={b} value={b}>{b}</option>
                     ))}
                   </select>
+                  {isOther && (
+                    <input
+                      type="text"
+                      placeholder={t('cart.buildingOtherPlaceholder')}
+                      value={buildingCustom}
+                      onChange={e => setBuildingCustom(e.target.value)}
+                      className="mt-1.5 w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral"
+                    />
+                  )}
                 </div>
 
-                {/* Localização específica — opcional */}
+                {/* Apartamento — optional */}
                 <div className="flex flex-col gap-1">
                   <label className="text-sm font-semibold text-gray-700 font-body">
-                    {t('cart.spotLabel')}
+                    {t('cart.apartmentLabel')}
                   </label>
                   <input
                     type="text"
-                    placeholder={t('cart.spotPlaceholder')}
-                    value={spot}
-                    onChange={e => setSpot(e.target.value)}
+                    placeholder={t('cart.apartmentPlaceholder')}
+                    value={apartmentNumber}
+                    onChange={e => setApartmentNumber(e.target.value)}
                     className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral"
                   />
                 </div>
               </div>
 
-              {/* Observações */}
+              {/* Notes */}
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-semibold text-gray-700 font-body">{t('cart.notesLabel')}</label>
                 <textarea

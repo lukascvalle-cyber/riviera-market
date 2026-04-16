@@ -14,6 +14,13 @@ import type { Map as MapboxMap } from 'mapbox-gl'
 // Pixels visible in peek mode (shows ~2-3 vendor cards)
 const PEEK_PX = 220
 
+// TODO: REMOVE SIMULATION - replace with real-time vendor location from DB
+// Delete this entire constant once the vendor is broadcasting GPS via useVendorLocation
+const SIMULATED_VENDOR_LOCATION: Record<string, [number, number]> = {
+  '6f173103-9a63-4163-9b05-d3067a4a5e0d': [-46.013242134647186, -23.80107764839738],
+  // SIMULATION: remove this entire constant when real-time location is active
+}
+
 /* ── Product card ── */
 function ProductCard({ product }: { product: Product }) {
   const { addItem, vendorId: cartVendorId } = useCart()
@@ -159,7 +166,26 @@ export function MapView() {
     openDrawer(vendor)
   }, [openDrawer])
 
-  const activeWithLocation = activeVendors.filter(v => v.location)
+  // TODO: REMOVE SIMULATION - inject simulated coords for vendors missing a real location
+  const activeWithLocation = activeVendors
+    .map(v => {
+      if (v.location) return v
+      const sim = SIMULATED_VENDOR_LOCATION[v.profile_id]
+      if (!sim) return v
+      return {
+        ...v,
+        location: {
+          vendor_id: v.id,
+          latitude: sim[1],
+          longitude: sim[0],
+          accuracy: null as null,
+          heading: null as null,
+          updated_at: new Date().toISOString(),
+        },
+      }
+    })
+    .filter(v => v.location)
+
   const onlineCount = allVendors.filter(v => v.is_active).length
 
   return (
