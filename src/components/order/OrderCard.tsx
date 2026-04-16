@@ -9,9 +9,10 @@ interface OrderCardProps {
   role: 'frequentador' | 'vendedor'
   onUpdateStatus?: (orderId: string, status: OrderStatus) => void
   onTrack?: (orderId: string) => void
+  onNavigate?: (order: Order) => void
 }
 
-export function OrderCard({ order, role, onUpdateStatus, onTrack }: OrderCardProps) {
+export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate }: OrderCardProps) {
   const { t } = useTranslation()
   const createdAt = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -67,6 +68,14 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack }: OrderCardPro
             && onTrack && (
             <Button size="sm" variant="ghost" onClick={() => onTrack(order.id)}>
               📍 {t('tracking.trackButton')}
+            </Button>
+          )}
+          {/* Navigate button — shown when vendor is delivering or confirmed */}
+          {role === 'vendedor'
+            && ['confirmed', 'delivering'].includes(order.status)
+            && onNavigate && (
+            <Button size="sm" variant="ghost" onClick={() => onNavigate(order)}>
+              🗺️ Navegar
             </Button>
           )}
           {action && onUpdateStatus && (

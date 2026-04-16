@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import mapboxgl from 'mapbox-gl'
 import { BeachMap, type BeachMapHandle } from '../../components/map/BeachMap'
 import { VendorPin } from '../../components/map/VendorPin'
 import { CartDrawer } from '../../components/order/CartDrawer'
@@ -9,7 +10,6 @@ import { useCart } from '../../contexts/CartContext'
 import { supabase } from '../../lib/supabase'
 import { CATEGORY_EMOJI, CATEGORY_COLORS } from '../../lib/constants'
 import type { VendorWithLocation, Product } from '../../types'
-import type { Map as MapboxMap } from 'mapbox-gl'
 
 // Pixels visible in peek mode (shows ~2-3 vendor cards)
 const PEEK_PX = 220
@@ -20,6 +20,9 @@ const SIMULATED_VENDOR_LOCATION: Record<string, [number, number]> = {
   '6f173103-9a63-4163-9b05-d3067a4a5e0d': [-46.013242134647186, -23.80107764839738],
   // SIMULATION: remove this entire constant when real-time location is active
 }
+
+// SIMULATION: remove when real buyer GPS is active
+const SIMULATED_BUYER_LOCATION: [number, number] = [-46.00405736577133, -23.79828486994515]
 
 /* ── Product card ── */
 function ProductCard({ product }: { product: Product }) {
@@ -92,7 +95,7 @@ function ProductCard({ product }: { product: Product }) {
 /* ═══════════════════════════════════════════════════════════ */
 export function MapView() {
   const mapRef = useRef<BeachMapHandle>(null)
-  const [map, setMap] = useState<MapboxMap | null>(null)
+  const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const { vendors: activeVendors, loading: mapLoading } = useVendorLocation()
   const { itemCount, total } = useCart()
   const { t } = useTranslation()
@@ -127,6 +130,28 @@ export function MapView() {
     return () => clearInterval(timer)
   }, [])
 
+  // SIMULATION: add simulated buyer marker — remove when real buyer GPS is active
+  useEffect(() => {
+    if (!map) return
+
+    const el = document.createElement('div')
+    el.style.cssText = `
+      width: 34px; height: 34px; border-radius: 50%;
+      background: #3b82f6; border: 3px solid white;
+      box-shadow: 0 2px 8px rgba(59,130,246,0.45);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px;
+    `
+    el.textContent = '🧑'
+    el.title = 'Você'
+
+    const marker = new mapboxgl.Marker({ element: el })
+      .setLngLat(SIMULATED_BUYER_LOCATION)
+      .addTo(map)
+
+    return () => { marker.remove() }
+  }, [map])
+
   // Fetch all approved vendors for the bottom sheet list
   useEffect(() => {
     supabase
@@ -144,7 +169,6 @@ export function MapView() {
             ? v.vendor_locations[0]
             : v.vendor_locations ?? undefined,
         }))
-        // Online vendors first, then offline
         setAllVendors(
           [...mapped].sort((a, b) => (b.is_active ? 1 : 0) - (a.is_active ? 1 : 0)),
         )
@@ -156,7 +180,6 @@ export function MapView() {
     setSheetState('peek')
     setProducts([])
     setDrawerOpen(true)
-    // Two-tick delay so the element is in the DOM before we animate
     setTimeout(() => setDrawerVisible(true), 10)
     setProductsLoading(true)
     const { data } = await supabase
@@ -278,7 +301,6 @@ export function MapView() {
           transition: 'transform 0.3s ease-out',
         }}
       >
-        {/* Drag handle — tap to toggle */}
         <button
           type="button"
           className="flex justify-center items-center pt-3 pb-1 w-full shrink-0"
@@ -288,7 +310,6 @@ export function MapView() {
           <div className="w-10 h-1 rounded-full bg-gray-300" />
         </button>
 
-        {/* Sheet header */}
         <div className="px-5 pt-2 pb-3 shrink-0 flex items-center justify-between">
           <p className="font-display font-bold text-gray-900 text-base">Vendedores</p>
           {onlineCount > 0 && (
@@ -299,7 +320,6 @@ export function MapView() {
           )}
         </div>
 
-        {/* Vendor list */}
         <div className="overflow-y-auto flex-1 px-4 pb-6">
           {allVendors.length === 0 ? (
             <p className="text-center text-gray-400 font-body text-sm py-8">
@@ -316,7 +336,6 @@ export function MapView() {
                     !vendor.is_active ? 'opacity-40' : ''
                   }`}
                 >
-                  {/* Category icon */}
                   <div
                     className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
                     style={{
@@ -327,8 +346,6 @@ export function MapView() {
                   >
                     {CATEGORY_EMOJI[vendor.category]}
                   </div>
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className={`font-body font-semibold truncate ${
                       vendor.is_active ? 'text-gray-900' : 'text-gray-500'
@@ -339,8 +356,6 @@ export function MapView() {
                       {t(`categories.${vendor.category}`)}
                     </p>
                   </div>
-
-                  {/* Online dot */}
                   {vendor.is_active && (
                     <span className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" />
                   )}
@@ -374,12 +389,10 @@ export function MapView() {
             transition: 'transform 0.3s ease-out',
           }}
         >
-          {/* Drawer handle bar */}
           <div className="flex justify-center pt-3 pb-1 shrink-0">
             <div className="w-10 h-1 rounded-full bg-gray-300" />
           </div>
 
-          {/* Drawer header */}
           <div className="flex items-center gap-3 px-5 pb-4 pt-2 border-b border-gray-100 shrink-0">
             <div
               className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
@@ -407,7 +420,6 @@ export function MapView() {
             </button>
           </div>
 
-          {/* Products */}
           <div className="overflow-y-auto flex-1 px-4 py-4 flex flex-col gap-3">
             {productsLoading ? (
               <div className="flex justify-center py-10">
@@ -424,7 +436,6 @@ export function MapView() {
             )}
           </div>
 
-          {/* Safe area spacer */}
           <div className="shrink-0" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
         </div>
       )}

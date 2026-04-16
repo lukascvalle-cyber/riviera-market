@@ -1,12 +1,14 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { useVendorPresence } from '../../hooks/useVendorPresence'
 import { useOrders } from '../../hooks/useOrders'
 import { VendorStatusBanner } from '../../components/vendor/VendorStatusBanner'
 import { OrderCard } from '../../components/order/OrderCard'
+import { NavigationSheet } from '../../components/map/NavigationSheet'
 import { Spinner } from '../../components/ui/Spinner'
-import type { OrderStatus } from '../../types'
 import { useToast } from '../../components/ui/Toast'
+import type { Order, OrderStatus } from '../../types'
 
 export function VendedorDashboard() {
   const { vendor } = useAuth()
@@ -15,12 +17,22 @@ export function VendedorDashboard() {
   const toast = useToast()
   const { t } = useTranslation()
 
+  // Navigation sheet state
+  const [navigatingOrder, setNavigatingOrder] = useState<Order | null>(null)
+
   const activeOrders = orders.filter(o => !['delivered', 'cancelled'].includes(o.status))
   const pastOrders = orders.filter(o => ['delivered', 'cancelled'].includes(o.status)).slice(0, 10)
 
   async function handleStatusUpdate(orderId: string, status: OrderStatus) {
     const ok = await updateStatus(orderId, status)
     if (!ok) toast(t('orders.updateError'), 'error')
+  }
+
+  async function handleMarkDelivered() {
+    if (!navigatingOrder) return
+    const ok = await updateStatus(navigatingOrder.id, 'delivered')
+    if (!ok) toast(t('orders.updateError'), 'error')
+    setNavigatingOrder(null)
   }
 
   return (
@@ -52,7 +64,13 @@ export function VendedorDashboard() {
         ) : (
           <div className="flex flex-col gap-3">
             {activeOrders.map(o => (
-              <OrderCard key={o.id} order={o} role="vendedor" onUpdateStatus={handleStatusUpdate} />
+              <OrderCard
+                key={o.id}
+                order={o}
+                role="vendedor"
+                onUpdateStatus={handleStatusUpdate}
+                onNavigate={setNavigatingOrder}
+              />
             ))}
           </div>
         )}
@@ -67,6 +85,16 @@ export function VendedorDashboard() {
             ))}
           </div>
         </section>
+      )}
+
+      {/* Navigation sheet — mounts when vendor taps "Navegar" on an order */}
+      {navigatingOrder && vendor && (
+        <NavigationSheet
+          order={navigatingOrder}
+          vendorId={vendor.id}
+          onClose={() => setNavigatingOrder(null)}
+          onMarkDelivered={handleMarkDelivered}
+        />
       )}
     </div>
   )
