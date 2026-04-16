@@ -111,6 +111,14 @@ export interface CartItem {
   quantity: number
 }
 
+export interface OrderMessage {
+  id: string
+  order_id: string
+  sender_id: string
+  message: string
+  created_at: string
+}
+
 export type VendorApplicationStatus = 'pending' | 'approved' | 'rejected'
 export type VendorType = 'ambulante' | 'barraca_fixa'
 

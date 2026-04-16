@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import mapboxgl from 'mapbox-gl'
 import { BeachMap, type BeachMapHandle } from '../../components/map/BeachMap'
@@ -6,8 +6,11 @@ import { VendorPin } from '../../components/map/VendorPin'
 import { CartDrawer } from '../../components/order/CartDrawer'
 import { Spinner } from '../../components/ui/Spinner'
 import { useVendorLocation } from '../../hooks/useVendorLocation'
+import { useOrders } from '../../hooks/useOrders'
 import { useCart } from '../../contexts/CartContext'
+import { useAuth } from '../../contexts/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { haversineDistance } from '../../lib/utils'
 import { CATEGORY_EMOJI, CATEGORY_COLORS } from '../../lib/constants'
 import type { VendorWithLocation, Product } from '../../types'
 
@@ -15,7 +18,6 @@ import type { VendorWithLocation, Product } from '../../types'
 const PEEK_PX = 220
 
 // TODO: REMOVE SIMULATION - replace with real-time vendor location from DB
-// Delete this entire constant once the vendor is broadcasting GPS via useVendorLocation
 const SIMULATED_VENDOR_LOCATION: Record<string, [number, number]> = {
   '6f173103-9a63-4163-9b05-d3067a4a5e0d': [-46.013242134647186, -23.80107764839738],
   // SIMULATION: remove this entire constant when real-time location is active
@@ -53,7 +55,6 @@ function ProductCard({ product }: { product: Product }) {
           <p className="font-body font-bold text-green-600 text-base">
             R${' '}{product.price_brl.toFixed(2).replace('.', ',')}
           </p>
-
           {qty === 0 ? (
             <button
               onClick={() => canAdd && addItem(product)}
@@ -98,7 +99,11 @@ export function MapView() {
   const [map, setMap] = useState<mapboxgl.Map | null>(null)
   const { vendors: activeVendors, loading: mapLoading } = useVendorLocation()
   const { itemCount, total } = useCart()
+  const { user } = useAuth()
   const { t } = useTranslation()
+
+  // Orders — used for proximity alert
+  const { orders } = useOrders('frequentador', user?.id ?? null)
 
   // All approved vendors for the bottom sheet
   const [allVendors, setAllVendors] = useState<VendorWithLocation[]>([])
@@ -119,6 +124,10 @@ export function MapView() {
   // Cart drawer
   const [cartOpen, setCartOpen] = useState(false)
 
+  // Proximity alert
+  const [proximityAlert, setProximityAlert] = useState(false)
+  const alertedOrdersRef = useRef<Set<string>>(new Set())
+
   // Acquire map instance after mount
   useEffect(() => {
     const timer = setInterval(() => {
@@ -130,10 +139,9 @@ export function MapView() {
     return () => clearInterval(timer)
   }, [])
 
-  // SIMULATION: add simulated buyer marker — remove when real buyer GPS is active
+  // SIMULATION: buyer marker — remove when real buyer GPS is active
   useEffect(() => {
     if (!map) return
-
     const el = document.createElement('div')
     el.style.cssText = `
       width: 34px; height: 34px; border-radius: 50%;
@@ -144,11 +152,9 @@ export function MapView() {
     `
     el.textContent = '🧑'
     el.title = 'Você'
-
     const marker = new mapboxgl.Marker({ element: el })
       .setLngLat(SIMULATED_BUYER_LOCATION)
       .addTo(map)
-
     return () => { marker.remove() }
   }, [map])
 
@@ -156,10 +162,7 @@ export function MapView() {
   useEffect(() => {
     supabase
       .from('vendors')
-      .select(`
-        *,
-        vendor_locations(vendor_id, latitude, longitude, accuracy, heading, updated_at)
-      `)
+      .select(`*, vendor_locations(vendor_id, latitude, longitude, accuracy, heading, updated_at)`)
       .eq('is_approved', true)
       .then(({ data }) => {
         if (!data) return
@@ -174,6 +177,54 @@ export function MapView() {
         )
       })
   }, [])
+
+  // TODO: REMOVE SIMULATION
+  const activeWithLocation = useMemo(() =>
+    activeVendors
+      .map(v => {
+        if (v.location) return v
+        const sim = SIMULATED_VENDOR_LOCATION[v.profile_id]
+        if (!sim) return v
+        return {
+          ...v,
+          location: {
+            vendor_id: v.id,
+            latitude: sim[1],
+            longitude: sim[0],
+            accuracy: null as null,
+            heading: null as null,
+            updated_at: new Date().toISOString(),
+          },
+        }
+      })
+      .filter(v => v.location),
+  [activeVendors])
+
+  // ── Proximity alert: check on every vendor location update ──
+  useEffect(() => {
+    const activeDeliveries = orders.filter(o =>
+      ['confirmed', 'delivering'].includes(o.status),
+    )
+    for (const order of activeDeliveries) {
+      if (alertedOrdersRef.current.has(order.id)) continue
+      const vendor = activeWithLocation.find(v => v.id === order.vendor_id)
+      if (!vendor?.location) continue
+
+      const dist = haversineDistance(
+        vendor.location.latitude,
+        vendor.location.longitude,
+        SIMULATED_BUYER_LOCATION[1], // lat
+        SIMULATED_BUYER_LOCATION[0], // lng
+      )
+
+      if (dist <= 50) {
+        alertedOrdersRef.current.add(order.id)
+        setProximityAlert(true)
+        // Vibrate if supported (200ms)
+        navigator.vibrate?.(200)
+      }
+    }
+  }, [activeWithLocation, orders])
 
   const openDrawer = useCallback(async (vendor: VendorWithLocation) => {
     setSelectedVendor(vendor)
@@ -213,26 +264,6 @@ export function MapView() {
     openDrawer(vendor)
   }, [openDrawer])
 
-  // TODO: REMOVE SIMULATION - inject simulated coords for vendors missing a real location
-  const activeWithLocation = activeVendors
-    .map(v => {
-      if (v.location) return v
-      const sim = SIMULATED_VENDOR_LOCATION[v.profile_id]
-      if (!sim) return v
-      return {
-        ...v,
-        location: {
-          vendor_id: v.id,
-          latitude: sim[1],
-          longitude: sim[0],
-          accuracy: null as null,
-          heading: null as null,
-          updated_at: new Date().toISOString(),
-        },
-      }
-    })
-    .filter(v => v.location)
-
   const onlineCount = allVendors.filter(v => v.is_active).length
 
   return (
@@ -241,14 +272,9 @@ export function MapView() {
       {/* ── Map ── */}
       <BeachMap ref={mapRef} className="w-full h-full" />
 
-      {/* ── Vendor pins (active vendors with GPS location) ── */}
+      {/* ── Vendor pins ── */}
       {map && activeWithLocation.map(vendor => (
-        <VendorPin
-          key={vendor.id}
-          map={map}
-          vendor={vendor}
-          onClick={openDrawer}
-        />
+        <VendorPin key={vendor.id} map={map} vendor={vendor} onClick={openDrawer} />
       ))}
 
       {/* ── Loading pill ── */}
@@ -263,15 +289,36 @@ export function MapView() {
         className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none transition-all duration-300"
         style={{
           opacity: showOfflineMsg ? 1 : 0,
-          transform: showOfflineMsg
-            ? 'translateX(-50%) translateY(0)'
-            : 'translateX(-50%) translateY(-8px)',
+          transform: showOfflineMsg ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(-8px)',
         }}
       >
         <div className="bg-gray-900/90 text-white rounded-full px-5 py-2.5 text-sm font-body shadow-lg whitespace-nowrap">
           Este vendedor está offline no momento
         </div>
       </div>
+
+      {/* ── Proximity alert modal ── */}
+      {proximityAlert && (
+        <div className="absolute inset-0 z-[35] flex items-center justify-center p-6 bg-black/40">
+          <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs text-center flex flex-col gap-4">
+            <div className="text-5xl">🚶</div>
+            <div>
+              <h3 className="font-display text-xl font-bold text-gray-900">
+                O seu pedido está a chegar!
+              </h3>
+              <p className="font-body text-sm text-gray-500 mt-1">
+                O vendedor está a menos de 50 metros.
+              </p>
+            </div>
+            <button
+              onClick={() => setProximityAlert(false)}
+              className="w-full bg-coral text-white rounded-2xl py-3 font-body font-semibold hover:bg-coral/90 transition-colors"
+            >
+              OK, estou a ver!
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ── Floating cart bar (iFood-style) ── */}
       {itemCount > 0 && (
@@ -338,18 +385,12 @@ export function MapView() {
                 >
                   <div
                     className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
-                    style={{
-                      background: vendor.is_active
-                        ? CATEGORY_COLORS[vendor.category]
-                        : '#D1D5DB',
-                    }}
+                    style={{ background: vendor.is_active ? CATEGORY_COLORS[vendor.category] : '#D1D5DB' }}
                   >
                     {CATEGORY_EMOJI[vendor.category]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-body font-semibold truncate ${
-                      vendor.is_active ? 'text-gray-900' : 'text-gray-500'
-                    }`}>
+                    <p className={`font-body font-semibold truncate ${vendor.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
                       {vendor.display_name}
                     </p>
                     <p className="text-xs text-gray-400 font-body">
@@ -371,11 +412,7 @@ export function MapView() {
         <div
           className="absolute inset-0 z-[25] bg-black/30"
           onClick={closeDrawer}
-          style={{
-            opacity: drawerVisible ? 1 : 0,
-            transition: 'opacity 0.3s',
-            backdropFilter: 'blur(1px)',
-          }}
+          style={{ opacity: drawerVisible ? 1 : 0, transition: 'opacity 0.3s', backdropFilter: 'blur(1px)' }}
         />
       )}
 
@@ -392,7 +429,6 @@ export function MapView() {
           <div className="flex justify-center pt-3 pb-1 shrink-0">
             <div className="w-10 h-1 rounded-full bg-gray-300" />
           </div>
-
           <div className="flex items-center gap-3 px-5 pb-4 pt-2 border-b border-gray-100 shrink-0">
             <div
               className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
@@ -419,12 +455,9 @@ export function MapView() {
               ✕
             </button>
           </div>
-
           <div className="overflow-y-auto flex-1 px-4 py-4 flex flex-col gap-3">
             {productsLoading ? (
-              <div className="flex justify-center py-10">
-                <Spinner size="md" />
-              </div>
+              <div className="flex justify-center py-10"><Spinner size="md" /></div>
             ) : products.length === 0 ? (
               <p className="text-center text-gray-400 font-body text-sm py-10">
                 {t('vendor.noProducts')}
@@ -435,7 +468,6 @@ export function MapView() {
               ))
             )}
           </div>
-
           <div className="shrink-0" style={{ height: 'env(safe-area-inset-bottom, 0px)' }} />
         </div>
       )}

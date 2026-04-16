@@ -10,9 +10,11 @@ interface OrderCardProps {
   onUpdateStatus?: (orderId: string, status: OrderStatus) => void
   onTrack?: (orderId: string) => void
   onNavigate?: (order: Order) => void
+  onOpenChat?: (orderId: string) => void
+  unreadCount?: number
 }
 
-export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate }: OrderCardProps) {
+export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, onOpenChat, unreadCount }: OrderCardProps) {
   const { t } = useTranslation()
   const createdAt = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -62,6 +64,21 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate }: 
           )}
         </div>
         <div className="flex items-center gap-2">
+          {/* Chat button — active orders only */}
+          {['pending', 'confirmed', 'delivering'].includes(order.status) && onOpenChat && (
+            <button
+              onClick={() => onOpenChat(order.id)}
+              className="relative w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-gray-600 shrink-0"
+              aria-label="Abrir chat"
+            >
+              💬
+              {(unreadCount ?? 0) > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                  {(unreadCount ?? 0) > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+          )}
           {/* Track button — only for frequentador on active orders */}
           {role === 'frequentador'
             && ['pending', 'confirmed', 'delivering'].includes(order.status)

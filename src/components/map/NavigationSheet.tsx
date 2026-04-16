@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { supabase } from '../../lib/supabase'
+import { haversineDistance } from '../../lib/utils'
 import { Button } from '../ui/Button'
 import type { Order } from '../../types'
 
@@ -19,20 +20,6 @@ const DASH_SEQUENCE = [
   [0, 3.5, 3, 0.5], [0, 4, 3, 0],
 ]
 
-/** Straight-line distance in metres between two lat/lng points (Haversine). */
-function haversineMeters(
-  lat1: number, lon1: number,
-  lat2: number, lon2: number,
-): number {
-  const R = 6_371_000
-  const toRad = (d: number) => (d * Math.PI) / 180
-  const dLat = toRad(lat2 - lat1)
-  const dLon = toRad(lon2 - lon1)
-  const a =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-}
 
 interface NavigationSheetProps {
   order: Order
@@ -207,7 +194,7 @@ export function NavigationSheet({
 
   // ── ETA / distance ──
   const distanceM = vendorCoords
-    ? Math.round(haversineMeters(vendorCoords[1], vendorCoords[0], buyerCoords[1], buyerCoords[0]))
+    ? Math.round(haversineDistance(vendorCoords[1], vendorCoords[0], buyerCoords[1], buyerCoords[0]))
     : null
   // Walking speed: 4 km/h → 1 min per 66.67 m
   const etaMin = distanceM !== null ? Math.max(1, Math.round(distanceM / 66.67)) : null

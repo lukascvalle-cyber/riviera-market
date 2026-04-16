@@ -1,16 +1,52 @@
+import { useEffect } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../components/ui/Toast'
+import { supabase } from '../../lib/supabase'
 import { LanguageSelector } from '../../components/ui/LanguageSelector'
 
 export function FrequentadorApp() {
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   const { t } = useTranslation()
+  const toast = useToast()
 
   const NAV = [
     { to: '/app', label: t('nav.map'), icon: '🗺️', end: true },
     { to: '/app/pedidos', label: t('nav.orders'), icon: '📋', end: false },
   ]
+
+  // Listen for order status changes and show toasts — active across all pages for this user
+  useEffect(() => {
+    if (!user?.id) return
+
+    const channel = supabase
+      .channel('order-status-buyer')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+          filter: `frequentador_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const { status } = payload.new as { status: string }
+          if (status === 'confirmed') {
+            toast('✅ Pedido aceite! O vendedor está a caminho.', 'success')
+          } else if (status === 'delivering') {
+            toast('🏃 O vendedor está a caminho!', 'info')
+          } else if (status === 'cancelled') {
+            toast('❌ Vendedor indisponível. Tente novamente.', 'error')
+          } else if (status === 'delivered') {
+            toast('🎉 Pedido entregue! Bom proveito.', 'success')
+          }
+        },
+      )
+      .subscribe()
+
+    return () => { supabase.removeChannel(channel) }
+  }, [user?.id, toast])
 
   return (
     <div className="flex flex-col h-screen">
