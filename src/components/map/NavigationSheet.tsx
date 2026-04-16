@@ -120,11 +120,11 @@ export function NavigationSheet({
         id: 'nav-route-glow',
         type: 'line',
         source: 'nav-route',
+        layout: { 'line-cap': 'round' as const },
         paint: {
           'line-color': '#0ea5e9',
           'line-width': 7,
           'line-opacity': 0.2,
-          'line-cap': 'round',
         },
       })
 
@@ -133,11 +133,11 @@ export function NavigationSheet({
         id: 'nav-route-dashed',
         type: 'line',
         source: 'nav-route',
+        layout: { 'line-cap': 'butt' as const },
         paint: {
           'line-color': '#0ea5e9',
           'line-width': 3,
           'line-dasharray': DASH_SEQUENCE[0] as number[],
-          'line-cap': 'butt',
         },
       })
 
