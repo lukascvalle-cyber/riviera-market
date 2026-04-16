@@ -115,6 +115,174 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
             'text-halo-width': 2,
           },
         })
+
+        // ── Módulo 7 ──
+        map.addSource('modulo-7', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 7' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.00594331339332, -23.798203215930513],
+                [-46.006615661970585, -23.798309689407304],
+                [-46.00695830114961, -23.79841024761062],
+                [-46.00867796193455, -23.79885388581387],
+                [-46.01111522552756, -23.799415825363795],
+                [-46.010643288545225, -23.800941922613063],
+                [-46.00572997201755, -23.79964651563266],
+                [-46.00594331339332, -23.798203215930513],
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-7-fill',
+          type: 'fill',
+          source: 'modulo-7',
+          paint: {
+            'fill-color': '#0ea5e9',
+            'fill-opacity': 0.15,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-7-outline',
+          type: 'line',
+          source: 'modulo-7',
+          paint: {
+            'line-color': '#0ea5e9',
+            'line-width': 2,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-7-label',
+          type: 'symbol',
+          source: 'modulo-7',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
+
+        // ── Módulo 6 ──
+        map.addSource('modulo-6', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 6' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.011137873124454, -23.799415460850483],
+                [-46.015973166403086, -23.8010707831354],
+                [-46.01534847247248, -23.80266670168855],
+                [-46.01063487281763, -23.800944593389417],
+                [-46.011137873124454, -23.799415460850483],
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-6-fill',
+          type: 'fill',
+          source: 'modulo-6',
+          paint: {
+            'fill-color': '#0ea5e9',
+            'fill-opacity': 0.15,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-6-outline',
+          type: 'line',
+          source: 'modulo-6',
+          paint: {
+            'line-color': '#0ea5e9',
+            'line-width': 2,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-6-label',
+          type: 'symbol',
+          source: 'modulo-6',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
+
+        // ── Módulo 5 ──
+        map.addSource('modulo-5', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 5' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.015981738600146, -23.80107432291568],
+                [-46.020999261373106, -23.802683941244624],
+                [-46.020366514202266, -23.804438799372065],
+                [-46.01535004365036, -23.80266595533989],
+                [-46.015981738600146, -23.80107432291568],
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-5-fill',
+          type: 'fill',
+          source: 'modulo-5',
+          paint: {
+            'fill-color': '#0ea5e9',
+            'fill-opacity': 0.15,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-5-outline',
+          type: 'line',
+          source: 'modulo-5',
+          paint: {
+            'line-color': '#0ea5e9',
+            'line-width': 2,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-5-label',
+          type: 'symbol',
+          source: 'modulo-5',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
       })
 
       mapRef.current = map
