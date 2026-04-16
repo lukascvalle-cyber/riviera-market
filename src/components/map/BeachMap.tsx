@@ -283,6 +283,107 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
             'text-halo-width': 2,
           },
         })
+
+        // ── Módulo 4 ──
+        map.addSource('modulo-4', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 4' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.02100150194667, -23.80268754121191],
+                [-46.02580268042851, -23.804754721836957],
+                [-46.02501318182769, -23.80650475244262],
+                [-46.02036605185347, -23.804437599672767],
+                [-46.02100150194667, -23.80268754121191],
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-4-fill',
+          type: 'fill',
+          source: 'modulo-4',
+          paint: { 'fill-color': '#0ea5e9', 'fill-opacity': 0.15 },
+        })
+
+        map.addLayer({
+          id: 'modulo-4-outline',
+          type: 'line',
+          source: 'modulo-4',
+          paint: { 'line-color': '#0ea5e9', 'line-width': 2 },
+        })
+
+        map.addLayer({
+          id: 'modulo-4-label',
+          type: 'symbol',
+          source: 'modulo-4',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
+
+        // ── Módulo 3 ──
+        map.addSource('modulo-3', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 3' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.02580307172906, -23.80476076938602],
+                [-46.02662466711027, -23.805212954650727],
+                [-46.02770300666285, -23.80578846864333],
+                [-46.0277992869801, -23.805882429869],
+                [-46.03069411279279, -23.8074210377724],
+                [-46.02946172473327, -23.809241501539404],
+                [-46.025013573128916, -23.806504927365026],
+                [-46.02580307172906, -23.80476076938602],
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-3-fill',
+          type: 'fill',
+          source: 'modulo-3',
+          paint: { 'fill-color': '#0ea5e9', 'fill-opacity': 0.15 },
+        })
+
+        map.addLayer({
+          id: 'modulo-3-outline',
+          type: 'line',
+          source: 'modulo-3',
+          paint: { 'line-color': '#0ea5e9', 'line-width': 2 },
+        })
+
+        map.addLayer({
+          id: 'modulo-3-label',
+          type: 'symbol',
+          source: 'modulo-3',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
       })
 
       mapRef.current = map
