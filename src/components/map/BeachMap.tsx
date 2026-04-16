@@ -49,6 +49,62 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
         showUserHeading: true,
       }), 'top-right')
 
+      map.on('load', () => {
+        map.addSource('modulo-8', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: 'Módulo 8' },
+            geometry: {
+              type: 'Polygon',
+              coordinates: [[
+                [-46.006051, -23.798203],
+                [-46.005682, -23.799237],
+                [-46.001780, -23.799606],
+                [-46.001163, -23.798455],
+                [-46.006051, -23.798203], // close ring
+              ]],
+            },
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-8-fill',
+          type: 'fill',
+          source: 'modulo-8',
+          paint: {
+            'fill-color': '#0ea5e9',
+            'fill-opacity': 0.15,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-8-line',
+          type: 'line',
+          source: 'modulo-8',
+          paint: {
+            'line-color': '#0ea5e9',
+            'line-width': 2,
+          },
+        })
+
+        map.addLayer({
+          id: 'modulo-8-label',
+          type: 'symbol',
+          source: 'modulo-8',
+          layout: {
+            'text-field': ['get', 'name'],
+            'text-size': 14,
+            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+          },
+          paint: {
+            'text-color': '#0ea5e9',
+            'text-halo-color': '#ffffff',
+            'text-halo-width': 2,
+          },
+        })
+      })
+
       mapRef.current = map
 
       return () => {
