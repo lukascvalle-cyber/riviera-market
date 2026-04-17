@@ -75,12 +75,12 @@ export function LoginPage() {
   }, [loginAttempted, profile, navigate])
 
   return (
-    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
+    <main className="min-h-screen flex items-center justify-center px-6 py-12" style={{ backgroundColor: '#FAFAF8' }}>
       <div className="w-full max-w-sm">
         {/* Logo & Branding */}
         <div className="text-center mb-10">
-          <WaveIcon className="w-12 h-12 text-primary mx-auto mb-4" />
-          <h1 className="text-2xl font-semibold text-primary tracking-tight">
+          <WaveIcon className="w-12 h-12 mx-auto mb-4" style={{ color: '#2E86AB' }} />
+          <h1 className="text-2xl font-semibold tracking-tight" style={{ color: '#2E86AB' }}>
             Riviera Market
           </h1>
           <p className="text-muted-foreground text-sm mt-1.5">
@@ -96,7 +96,8 @@ export function LoginPage() {
               placeholder={t('auth.login.email')}
               autoComplete="email"
               {...register('email')}
-              className="w-full h-12 px-4 rounded-[10px] border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              className="w-full h-12 px-4 rounded-[10px] bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#2E86AB] focus:border-transparent transition-all"
+              style={{ border: '1px solid #E8E8E4' }}
             />
             {errors.email && (
               <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
@@ -110,7 +111,8 @@ export function LoginPage() {
                 placeholder={t('auth.login.password')}
                 autoComplete="current-password"
                 {...register('password')}
-                className="w-full h-12 px-4 pr-12 rounded-[10px] border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full h-12 px-4 pr-12 rounded-[10px] bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#2E86AB] focus:border-transparent transition-all"
+                style={{ border: '1px solid #E8E8E4' }}
               />
               <button
                 type="button"
@@ -133,7 +135,8 @@ export function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full h-[52px] bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-[52px] text-white font-semibold rounded-xl transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{ backgroundColor: '#2E86AB' }}
           >
             {isSubmitting ? '...' : t('auth.login.submit')}
           </button>
@@ -150,7 +153,8 @@ export function LoginPage() {
         <div className="text-center">
           <Link
             to="/cadastro-vendedor"
-            className="text-primary text-sm font-medium hover:underline underline-offset-2 transition-all"
+            className="text-sm font-medium hover:underline underline-offset-2 transition-all"
+            style={{ color: '#2E86AB' }}
           >
             {t('auth.login.vendorRegisterLink')}
           </Link>
