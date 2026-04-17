@@ -238,9 +238,7 @@ export function MapView() {
             ? v.vendor_locations[0]
             : v.vendor_locations ?? undefined,
         }))
-        setAllVendors(
-          [...mapped].sort((a, b) => (b.is_active ? 1 : 0) - (a.is_active ? 1 : 0)),
-        )
+        setAllVendors(mapped)
       })
   }, [])
 
@@ -332,6 +330,51 @@ export function MapView() {
 
   const onlineCount = allVendors.filter(v => v.is_active).length
 
+  // Sort vendors: online first, then by distance from buyer
+  const sortedVendors = useMemo(() => {
+    return [...allVendors]
+      .map(vendor => {
+        const dist = vendor.location
+          ? haversineDistance(vendor.location.latitude, vendor.location.longitude, buyerCoords[1], buyerCoords[0])
+          : null
+        return { vendor, dist }
+      })
+      .sort((a, b) => {
+        if (b.vendor.is_active !== a.vendor.is_active) return b.vendor.is_active ? 1 : -1
+        if (a.dist === null && b.dist === null) return 0
+        if (a.dist === null) return 1
+        if (b.dist === null) return -1
+        return a.dist - b.dist
+      })
+  }, [allVendors, buyerCoords])
+
+  function formatDist(m: number | null): string | null {
+    if (m === null) return null
+    return m < 1000 ? `~${Math.round(m)}m` : `~${(m / 1000).toFixed(1)}km`
+  }
+
+  // Drag gesture state
+  const dragStartYRef = useRef<number | null>(null)
+  const [dragOffset, setDragOffset] = useState(0)
+
+  function handleDragStart(e: React.TouchEvent) {
+    dragStartYRef.current = e.touches[0].clientY
+  }
+
+  function handleDragMove(e: React.TouchEvent) {
+    if (dragStartYRef.current === null) return
+    const delta = e.touches[0].clientY - dragStartYRef.current
+    setDragOffset(delta)
+  }
+
+  function handleDragEnd() {
+    if (dragStartYRef.current === null) return
+    if (dragOffset < -50) setSheetState('expanded')
+    else if (dragOffset > 50) setSheetState('peek')
+    setDragOffset(0)
+    dragStartYRef.current = null
+  }
+
   return (
     <div className="relative w-full h-full overflow-hidden">
 
@@ -414,18 +457,21 @@ export function MapView() {
       <div
         className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-2xl flex flex-col z-20"
         style={{
-          height: '70vh',
+          height: '85vh',
           transform: sheetState === 'peek'
-            ? `translateY(calc(100% - ${PEEK_PX}px))`
-            : 'translateY(0)',
-          transition: 'transform 0.3s ease-out',
+            ? `translateY(calc(100% - ${PEEK_PX}px + ${dragOffset}px))`
+            : `translateY(${Math.max(0, dragOffset)}px)`,
+          transition: dragOffset !== 0 ? 'none' : 'transform 0.3s ease-out',
         }}
       >
-        {/* Handle */}
+        {/* Handle — tap to toggle, drag to resize */}
         <button
           type="button"
-          className="flex justify-center items-center pt-3 pb-1 w-full shrink-0"
+          className="flex justify-center items-center pt-3 pb-1 w-full shrink-0 touch-none"
           onClick={() => setSheetState(s => s === 'peek' ? 'expanded' : 'peek')}
+          onTouchStart={handleDragStart}
+          onTouchMove={handleDragMove}
+          onTouchEnd={handleDragEnd}
           aria-label="Expandir lista de vendedores"
         >
           <div className="w-8 h-1 rounded-full bg-[#E8E8E4]" />
@@ -443,14 +489,14 @@ export function MapView() {
         </div>
 
         {/* Vendor list */}
-        <div className="overflow-y-auto flex-1 px-4 pb-6">
-          {allVendors.length === 0 ? (
+        <div className="overflow-y-auto flex-1 px-4 pb-6" style={{ WebkitOverflowScrolling: 'touch' }}>
+          {sortedVendors.length === 0 ? (
             <p className="text-center text-[#6B7280] font-body text-sm py-8">
               {t('map.noActive')}
             </p>
           ) : (
             <div className="flex flex-col divide-y divide-[#E8E8E4]">
-              {allVendors.map(vendor => (
+              {sortedVendors.map(({ vendor, dist }) => (
                 <button
                   key={vendor.id}
                   type="button"
@@ -473,9 +519,14 @@ export function MapView() {
                       {t(`categories.${vendor.category}`)}
                     </p>
                   </div>
-                  {vendor.is_active && (
-                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: '#52B788' }} />
-                  )}
+                  <div className="flex items-center gap-2 shrink-0">
+                    {formatDist(dist) && (
+                      <span className="text-xs font-body text-[#6B7280]">{formatDist(dist)}</span>
+                    )}
+                    {vendor.is_active && (
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: '#52B788' }} />
+                    )}
+                  </div>
                 </button>
               ))}
             </div>
