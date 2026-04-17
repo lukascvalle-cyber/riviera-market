@@ -44,7 +44,10 @@ export function useOrderTracking(orderId: string | null) {
             setOrder(prev => prev ? { ...prev, ...(payload.new as Partial<Order>) } : null)
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[useOrderTracking] status channel error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[useOrderTracking] status CHANNEL_ERROR, order:', orderId)
+        })
     } catch (err) {
       console.error('[useOrderTracking] status subscription error:', err)
     }
@@ -69,7 +72,10 @@ export function useOrderTracking(orderId: string | null) {
             }
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[useOrderTracking] location channel error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[useOrderTracking] location CHANNEL_ERROR, vendor:', vendorId)
+        })
     } catch (err) {
       console.error('[useOrderTracking] location subscription error:', err)
     }

@@ -34,7 +34,7 @@ export function AdminDashboard() {
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="font-display text-3xl font-bold text-[#1A1A2E] mb-6">{t('admin.dashboard')}</h1>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <MetricCard label={t('admin.totalUsers')} value={metrics.totalUsers} icon="👥" color="text-[#2E86AB]" />
+        <MetricCard label="Clientes" value={metrics.totalUsers} icon="🏖️" color="text-[#2E86AB]" />
         <MetricCard label={t('admin.activeVendors')} value={metrics.activeVendors} icon="🟢" color="text-[#52B788]" />
         <MetricCard label={t('admin.ordersToday')} value={metrics.ordersToday} icon="📦" color="text-[#2E86AB]" />
         <MetricCard

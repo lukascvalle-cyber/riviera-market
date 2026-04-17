@@ -45,7 +45,10 @@ export function FrequentadorApp() {
             }
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[order-status-buyer] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[order-status-buyer] CHANNEL_ERROR, user:', user?.id)
+        })
     } catch (err) {
       console.error('[order-status-buyer] Realtime subscription error:', err)
     }

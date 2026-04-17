@@ -8,6 +8,7 @@ import { FullPageSpinner } from './components/ui/Spinner'
 // Auth pages
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
+import { FrequentadorRegisterPage } from './pages/auth/FrequentadorRegisterPage'
 import { VendorRegisterPage } from './pages/auth/VendorRegisterPage'
 
 // Frequentador
@@ -30,6 +31,7 @@ import { AdminMapPage } from './pages/admin/AdminMapPage'
 import { VendorsManagementPage } from './pages/admin/VendorsManagementPage'
 import { OrdersManagementPage } from './pages/admin/OrdersManagementPage'
 import { VendorApplicationsPage } from './pages/admin/VendorApplicationsPage'
+import { CustomersPage } from './pages/admin/CustomersPage'
 
 function RootRedirect() {
   const { user, profile, loading } = useAuth()
@@ -46,6 +48,7 @@ function AppRoutes() {
       <Route path="/" element={<RootRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/cadastro" element={<FrequentadorRegisterPage />} />
       <Route path="/cadastro-vendedor" element={<VendorRegisterPage />} />
 
       {/* Frequentador */}
@@ -91,6 +94,7 @@ function AppRoutes() {
         <Route path="vendedores" element={<VendorsManagementPage />} />
         <Route path="pedidos" element={<OrdersManagementPage />} />
         <Route path="cadastros" element={<VendorApplicationsPage />} />
+        <Route path="clientes" element={<CustomersPage />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

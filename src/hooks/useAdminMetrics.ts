@@ -26,12 +26,12 @@ export function useAdminMetrics() {
     todayStart.setHours(0, 0, 0, 0)
 
     const [
-      { count: activeVendors },
-      { count: ordersToday },
-      { count: pendingOrders },
-      { count: totalVendors },
-      { count: totalUsers },
-      { data: todayOrdersData },
+      activeVendorsRes,
+      ordersTodayRes,
+      pendingOrdersRes,
+      totalVendorsRes,
+      totalUsersRes,
+      todayOrdersRes,
     ] = await Promise.all([
       supabase.from('vendors').select('*', { count: 'exact', head: true }).eq('is_active', true),
       supabase.from('orders').select('*', { count: 'exact', head: true }).gte('created_at', todayStart.toISOString()),
@@ -41,14 +41,24 @@ export function useAdminMetrics() {
       supabase.from('orders').select('total_brl').gte('created_at', todayStart.toISOString()).neq('status', 'cancelled'),
     ])
 
-    const revenueToday = (todayOrdersData ?? []).reduce((sum, o) => sum + (o.total_brl ?? 0), 0)
+    // Always log the frequentador count so RLS silently returning null is visible
+    console.log('frequentador count:', totalUsersRes.count, 'error:', totalUsersRes.error)
+
+    if (activeVendorsRes.error) console.error('[adminMetrics] vendors active:', activeVendorsRes.error.message)
+    if (ordersTodayRes.error) console.error('[adminMetrics] orders today:', ordersTodayRes.error.message)
+    if (pendingOrdersRes.error) console.error('[adminMetrics] orders pending:', pendingOrdersRes.error.message)
+    if (totalVendorsRes.error) console.error('[adminMetrics] vendors total:', totalVendorsRes.error.message)
+    if (totalUsersRes.error) console.error('[adminMetrics] profiles frequentador:', totalUsersRes.error.message)
+    if (todayOrdersRes.error) console.error('[adminMetrics] revenue today:', todayOrdersRes.error.message)
+
+    const revenueToday = (todayOrdersRes.data ?? []).reduce((sum, o) => sum + (o.total_brl ?? 0), 0)
 
     setMetrics({
-      activeVendors: activeVendors ?? 0,
-      ordersToday: ordersToday ?? 0,
-      pendingOrders: pendingOrders ?? 0,
-      totalVendors: totalVendors ?? 0,
-      totalUsers: totalUsers ?? 0,
+      activeVendors: activeVendorsRes.count ?? 0,
+      ordersToday: ordersTodayRes.count ?? 0,
+      pendingOrders: pendingOrdersRes.count ?? 0,
+      totalVendors: totalVendorsRes.count ?? 0,
+      totalUsers: totalUsersRes.count ?? 0,
       revenueToday,
     })
     setLoading(false)

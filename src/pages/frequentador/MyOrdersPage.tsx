@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrders } from '../../hooks/useOrders'
@@ -7,17 +6,21 @@ import { useToast } from '../../components/ui/Toast'
 import { supabase } from '../../lib/supabase'
 import { OrderCard } from '../../components/order/OrderCard'
 import { OrderChat } from '../../components/chat/OrderChat'
+import { BuyerTrackingSheet } from '../../components/map/BuyerTrackingSheet'
+import { ReviewSheet } from '../../components/order/ReviewSheet'
 import { Spinner } from '../../components/ui/Spinner'
-import type { OrderMessage } from '../../types'
+import type { Order, OrderMessage } from '../../types'
 
 export function MyOrdersPage() {
   const { user } = useAuth()
   const { orders, loading } = useOrders('frequentador', user?.id ?? null)
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const toast = useToast()
 
   const [chatOrderId, setChatOrderId] = useState<string | null>(null)
+  const [trackingOrder, setTrackingOrder] = useState<Order | null>(null)
+  const [reviewTarget, setReviewTarget] = useState<{ orderId: string; vendorId: string } | null>(null)
+  const [reviewedOrderIds, setReviewedOrderIds] = useState<Set<string>>(new Set())
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
 
   // Keep chat order id in a ref so the subscription callback always sees the latest value
@@ -31,8 +34,28 @@ export function MyOrdersPage() {
     .map(o => o.id)
 
   const handleTrack = useCallback((orderId: string) => {
-    navigate(`/app/rastreamento/${orderId}`)
-  }, [navigate])
+    const order = orders.find(o => o.id === orderId)
+    if (order) setTrackingOrder(order)
+  }, [orders])
+
+  // Fetch which delivered orders the buyer has already reviewed
+  useEffect(() => {
+    if (!user?.id) return
+    const deliveredIds = orders.filter(o => o.status === 'delivered').map(o => o.id)
+    if (deliveredIds.length === 0) return
+    supabase
+      .from('vendor_reviews')
+      .select('order_id')
+      .eq('buyer_id', user.id)
+      .in('order_id', deliveredIds)
+      .then(({ data }) => {
+        if (data) setReviewedOrderIds(new Set(data.map(r => r.order_id)))
+      })
+  }, [user?.id, orders])
+
+  const handleReview = useCallback((orderId: string, vendorId: string) => {
+    setReviewTarget({ orderId, vendorId })
+  }, [])
 
   function openChat(orderId: string) {
     setChatOrderId(orderId)
@@ -69,7 +92,10 @@ export function MyOrdersPage() {
             toast(`💬 ${msg.message.length > 40 ? msg.message.slice(0, 40) + '…' : msg.message}`, 'info')
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[buyer-messages] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[buyer-messages] CHANNEL_ERROR, user:', user?.id)
+        })
     } catch (err) {
       console.error('[buyer-messages] Realtime subscription error:', err)
     }
@@ -102,7 +128,9 @@ export function MyOrdersPage() {
               role="frequentador"
               onTrack={handleTrack}
               onOpenChat={openChat}
+              onReview={handleReview}
               unreadCount={unreadCounts[o.id] ?? 0}
+              isReviewed={reviewedOrderIds.has(o.id)}
             />
           ))
         )}
@@ -116,6 +144,27 @@ export function MyOrdersPage() {
           currentUserId={user.id}
           orderStatus={chatOrder.status}
           partnerName={chatOrder.vendor?.display_name ?? 'Vendedor'}
+        />
+      )}
+
+      {trackingOrder && user && (
+        <BuyerTrackingSheet
+          open={trackingOrder !== null}
+          onClose={() => setTrackingOrder(null)}
+          order={trackingOrder}
+          currentUserId={user.id}
+        />
+      )}
+
+      {reviewTarget && user && (
+        <ReviewSheet
+          open={reviewTarget !== null}
+          onClose={() => setReviewTarget(null)}
+          orderId={reviewTarget.orderId}
+          vendorId={reviewTarget.vendorId}
+          vendorName={orders.find(o => o.id === reviewTarget.orderId)?.vendor?.display_name ?? 'Vendedor'}
+          currentUserId={user.id}
+          onSubmitted={() => setReviewedOrderIds(prev => new Set([...prev, reviewTarget.orderId]))}
         />
       )}
     </div>

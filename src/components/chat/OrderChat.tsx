@@ -50,11 +50,17 @@ export function OrderChat({
   async function handleSend() {
     const text = input.trim()
     if (!text || sending) return
+    if (!orderId) {
+      console.error('OrderChat: orderId is null or undefined')
+      return
+    }
     setSending(true)
-    await sendMessage(text)
-    setInput('')
+    const result = await sendMessage(text)
     setSending(false)
-    textareaRef.current?.focus()
+    if (!result?.error) {
+      setInput('')
+      textareaRef.current?.focus()
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {

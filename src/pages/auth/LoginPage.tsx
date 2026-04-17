@@ -150,13 +150,15 @@ export function LoginPage() {
         </div>
 
         {/* Buyer registration */}
-        <Link
-          to="/cadastro"
-          className="w-full h-[52px] flex items-center justify-center font-semibold rounded-xl border-2 transition-colors hover:opacity-80"
-          style={{ borderColor: '#2E86AB', color: '#2E86AB' }}
-        >
-          Criar conta como cliente
-        </Link>
+        <div className="text-center">
+          <Link
+            to="/cadastro"
+            className="block text-center text-sm hover:underline mt-2"
+            style={{ color: '#2E86AB' }}
+          >
+            Registrar
+          </Link>
+        </div>
 
         {/* Vendor registration link */}
         <div className="text-center mt-4">

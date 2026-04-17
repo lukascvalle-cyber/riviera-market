@@ -32,8 +32,6 @@ export function VendorPin({ map, vendor, onClick }: VendorPinProps) {
       box-shadow: 0 2px 8px rgba(46,134,171,0.25);
       display: flex; align-items: center; justify-content: center;
       font-size: 18px; cursor: pointer;
-      position: relative;
-      transition: transform 0.15s ease;
     `
     el.textContent = CATEGORY_EMOJI[vendor.category]
     el.title = vendor.display_name
@@ -52,7 +50,7 @@ export function VendorPin({ map, vendor, onClick }: VendorPinProps) {
     // Use refs so click always passes the latest vendor object
     el.addEventListener('click', () => onClickRef.current(vendorRef.current))
 
-    const marker = new mapboxgl.Marker({ element: el })
+    const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
       .setLngLat([vendor.location.longitude, vendor.location.latitude])
       .addTo(map)
 

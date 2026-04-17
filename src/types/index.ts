@@ -119,6 +119,16 @@ export interface OrderMessage {
   created_at: string
 }
 
+export interface VendorReview {
+  id: string
+  order_id: string
+  vendor_id: string
+  buyer_id: string
+  rating: number
+  review_text: string | null
+  created_at: string
+}
+
 export type VendorApplicationStatus = 'pending' | 'approved' | 'rejected'
 export type VendorType = 'ambulante' | 'barraca_fixa'
 

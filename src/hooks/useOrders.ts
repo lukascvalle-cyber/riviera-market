@@ -45,7 +45,10 @@ export function useOrders(mode: 'frequentador' | 'vendedor', id: string | null) 
           { event: '*', schema: 'public', table: 'orders', filter },
           () => { fetchOrders() },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[useOrders] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[useOrders] Channel error, mode:', mode, 'id:', id)
+        })
     } catch (err) {
       console.error('[useOrders] Realtime subscription error:', err)
     }

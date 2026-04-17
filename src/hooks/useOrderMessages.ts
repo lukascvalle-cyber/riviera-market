@@ -46,7 +46,11 @@ export function useOrderMessages(orderId: string | null, currentUserId: string |
             })
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[useOrderMessages] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[useOrderMessages] Channel error for order:', orderId)
+          else console.log('[useOrderMessages] Realtime status:', status, 'order:', orderId)
+        })
     } catch (err) {
       console.error('[useOrderMessages] Realtime subscription error:', err)
     }
@@ -56,12 +60,15 @@ export function useOrderMessages(orderId: string | null, currentUserId: string |
 
   const sendMessage = useCallback(
     async (text: string) => {
-      if (!orderId || !currentUserId || !text.trim()) return
-      await supabase.from('order_messages').insert({
-        order_id: orderId,
-        sender_id: currentUserId,
-        message: text.trim(),
-      })
+      if (!orderId || !currentUserId || !text.trim()) {
+        console.error('[sendMessage] guard failed — orderId:', orderId, 'currentUserId:', currentUserId)
+        return { error: new Error('Missing orderId or currentUserId') }
+      }
+      const payload = { order_id: orderId, sender_id: currentUserId, message: text.trim() }
+      console.log('[sendMessage] inserting:', payload)
+      const { data, error } = await supabase.from('order_messages').insert(payload).select()
+      console.log('[sendMessage] result — data:', data, 'error:', error)
+      return { error }
     },
     [orderId, currentUserId],
   )

@@ -4,6 +4,7 @@ import mapboxgl from 'mapbox-gl'
 import { BeachMap, type BeachMapHandle } from '../../components/map/BeachMap'
 import { VendorPin } from '../../components/map/VendorPin'
 import { CartDrawer } from '../../components/order/CartDrawer'
+import { LocationPermissionSheet } from '../../components/map/LocationPermissionSheet'
 import { Spinner } from '../../components/ui/Spinner'
 import { useVendorLocation } from '../../hooks/useVendorLocation'
 import { useOrders } from '../../hooks/useOrders'
@@ -131,6 +132,46 @@ export function MapView() {
   const [proximityAlert, setProximityAlert] = useState(false)
   const alertedOrdersRef = useRef<Set<string>>(new Set())
 
+  // Buyer location from profiles table (falls back to simulation if not set)
+  const [buyerCoords, setBuyerCoords] = useState<[number, number]>(SIMULATED_BUYER_LOCATION)
+
+  // Location permission state: 'checking' | 'prompt' | 'granted' | 'denied' | 'dismissed'
+  const [locationPermission, setLocationPermission] = useState<'checking' | 'prompt' | 'granted' | 'denied' | 'dismissed'>('checking')
+
+  // Check geolocation permission on mount (only when map view is active)
+  useEffect(() => {
+    if (!navigator.permissions) {
+      // Browser doesn't support permissions API — show the sheet to prompt
+      setLocationPermission('prompt')
+      return
+    }
+    navigator.permissions.query({ name: 'geolocation' as PermissionName }).then(result => {
+      setLocationPermission(result.state as 'prompt' | 'granted' | 'denied')
+      // Auto-get coords if already granted
+      if (result.state === 'granted') {
+        navigator.geolocation.getCurrentPosition(
+          pos => handleLocationGranted(pos.coords),
+          () => {},
+          { enableHighAccuracy: true, timeout: 8_000 },
+        )
+      }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  function handleLocationGranted(coords: GeolocationCoordinates) {
+    const lngLat: [number, number] = [coords.longitude, coords.latitude]
+    setBuyerCoords(lngLat)
+    setLocationPermission('granted')
+    // Save to profile
+    if (user?.id) {
+      supabase.from('profiles').update({
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+      } as Record<string, unknown>).eq('id', user.id).then(() => {})
+    }
+  }
+
   // Acquire map instance after mount
   useEffect(() => {
     const timer = setInterval(() => {
@@ -142,7 +183,29 @@ export function MapView() {
     return () => clearInterval(timer)
   }, [])
 
-  // SIMULATION: buyer marker — remove when real buyer GPS is active
+  // Fetch buyer location from profiles and center map
+  useEffect(() => {
+    if (!user?.id) return
+    supabase
+      .from('profiles')
+      .select('latitude, longitude')
+      .eq('id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const d = data as { latitude: number | null; longitude: number | null } | null
+        if (d?.latitude != null && d?.longitude != null) {
+          setBuyerCoords([d.longitude, d.latitude])
+        }
+      })
+  }, [user?.id])
+
+  // Fly to buyer coords once map is ready (or when coords update)
+  useEffect(() => {
+    if (!map || !buyerCoords) return
+    mapRef.current?.flyTo(buyerCoords[0], buyerCoords[1], 16)
+  }, [map, buyerCoords])
+
+  // Buyer marker — updates position when real coords arrive
   useEffect(() => {
     if (!map) return
     const el = document.createElement('div')
@@ -155,11 +218,11 @@ export function MapView() {
     `
     el.textContent = '🧑'
     el.title = 'Você'
-    const marker = new mapboxgl.Marker({ element: el })
-      .setLngLat(SIMULATED_BUYER_LOCATION)
+    const marker = new mapboxgl.Marker({ element: el, anchor: 'center' })
+      .setLngLat(buyerCoords)
       .addTo(map)
     return () => { marker.remove() }
-  }, [map])
+  }, [map, buyerCoords])
 
   // Fetch all approved vendors for the bottom sheet list
   useEffect(() => {
@@ -216,8 +279,8 @@ export function MapView() {
       const dist = haversineDistance(
         vendor.location.latitude,
         vendor.location.longitude,
-        SIMULATED_BUYER_LOCATION[1], // lat
-        SIMULATED_BUYER_LOCATION[0], // lng
+        buyerCoords[1], // lat
+        buyerCoords[0], // lng
       )
 
       if (dist <= 50) {
@@ -227,7 +290,7 @@ export function MapView() {
         navigator.vibrate?.(200)
       }
     }
-  }, [activeWithLocation, orders])
+  }, [activeWithLocation, orders, buyerCoords])
 
   const openDrawer = useCallback(async (vendor: VendorWithLocation) => {
     setSelectedVendor(vendor)
@@ -493,6 +556,16 @@ export function MapView() {
 
       {/* ── Cart drawer ── */}
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+
+      {/* ── Location permission sheet ── */}
+      {(locationPermission === 'prompt' || locationPermission === 'denied') && (
+        <LocationPermissionSheet
+          onGranted={coords => {
+            handleLocationGranted(coords)
+          }}
+          onDismissed={() => setLocationPermission('dismissed')}
+        />
+      )}
     </div>
   )
 }

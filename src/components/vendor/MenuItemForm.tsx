@@ -50,10 +50,18 @@ export function MenuItemForm({ vendorId, product, onSuccess, onCancel }: MenuIte
     const file = e.target.files?.[0]
     if (!file) return
     setUploading(true)
-    const path = `${vendorId}/${Date.now()}_${file.name}`
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const path = `${vendorId}/${Date.now()}_${safeName}`
+    console.log('[photoUpload] bucket=product-photos path=', path, 'file=', file.name, file.type, file.size)
     const { error } = await supabase.storage.from('product-photos').upload(path, file, { upsert: true })
-    if (error) { toast(t('product.uploadError'), 'error'); setUploading(false); return }
+    if (error) {
+      console.error('[photoUpload] storage error:', error.message, error)
+      toast(`${t('product.uploadError')}: ${error.message}`, 'error')
+      setUploading(false)
+      return
+    }
     const { data: { publicUrl } } = supabase.storage.from('product-photos').getPublicUrl(path)
+    console.log('[photoUpload] success, publicUrl=', publicUrl)
     setPhotoUrl(publicUrl)
     setUploading(false)
   }
@@ -77,9 +85,9 @@ export function MenuItemForm({ vendorId, product, onSuccess, onCancel }: MenuIte
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <Input label={t('product.name')} {...register('name')} error={errors.name?.message} />
       <div className="flex flex-col gap-1">
-        <label className="text-sm font-semibold text-gray-700 font-body">{t('product.description')}</label>
+        <label className="text-sm font-semibold text-[#1A1A2E] font-body">{t('product.description')}</label>
         <textarea
-          className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral resize-none"
+          className="w-full rounded-[10px] border border-[#E8E8E4] px-4 py-2.5 font-body text-[#1A1A2E] placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] resize-none"
           rows={2}
           placeholder={t('product.descriptionPlaceholder')}
           {...register('description')}

@@ -40,15 +40,15 @@ function buildTrackingMarker(emoji: string): HTMLElement {
   const ring = document.createElement('div')
   ring.style.cssText = `
     position:absolute;inset:0;border-radius:50%;
-    background:rgba(212,98,42,0.25);
+    background:rgba(46,134,171,0.25);
     animation:rivieraPulse 1.8s ease-out infinite;
   `
 
   const pin = document.createElement('div')
   pin.style.cssText = `
     position:absolute;inset:6px;border-radius:50%;
-    background:#D4622A;border:3px solid white;
-    box-shadow:0 3px 10px rgba(0,0,0,0.4);
+    background:#2E86AB;border:3px solid white;
+    box-shadow:0 3px 10px rgba(46,134,171,0.4);
     display:flex;align-items:center;justify-content:center;
     font-size:19px;
   `
@@ -93,7 +93,7 @@ export function OrderTrackingPage() {
 
     if (!markerRef.current) {
       const el = buildTrackingMarker(emoji)
-      const m = new mapboxgl.Marker({ element: el })
+      const m = new mapboxgl.Marker({ element: el, anchor: 'center' })
         .setLngLat([longitude, latitude])
         .addTo(mapInstance)
       markerRef.current = m
@@ -118,7 +118,7 @@ export function OrderTrackingPage() {
   /* ── Loading ── */
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center bg-sand">
+      <div className="flex h-full items-center justify-center" style={{ backgroundColor: '#FAFAF8' }}>
         <Spinner size="lg" />
       </div>
     )
@@ -127,11 +127,12 @@ export function OrderTrackingPage() {
   /* ── Order not found ── */
   if (!order) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-4 bg-sand p-6">
-        <p className="font-body text-gray-500">Pedido não encontrado.</p>
+      <div className="flex h-full flex-col items-center justify-center gap-4 p-6" style={{ backgroundColor: '#FAFAF8' }}>
+        <p className="font-body text-[#6B7280]">Pedido não encontrado.</p>
         <button
           onClick={() => navigate('/app/pedidos')}
-          className="font-body font-semibold text-coral hover:underline"
+          className="font-body font-semibold hover:underline"
+          style={{ color: '#2E86AB' }}
         >
           ← {t('tracking.backToOrders')}
         </button>
@@ -147,17 +148,18 @@ export function OrderTrackingPage() {
   /* ── Delivered success screen ── */
   if (isDelivered) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-6 bg-sand p-8">
+      <div className="flex h-full flex-col items-center justify-center gap-6 p-8" style={{ backgroundColor: '#FAFAF8' }}>
         <div className="text-6xl">🎉</div>
         <div className="text-center">
-          <h2 className="font-display text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="font-display text-2xl font-bold text-[#1A1A2E] mb-2">
             {t('tracking.delivered')}
           </h2>
-          <p className="font-body text-gray-500">{t('tracking.deliveredMsg')}</p>
+          <p className="font-body text-[#6B7280]">{t('tracking.deliveredMsg')}</p>
         </div>
         <button
           onClick={() => navigate('/app')}
-          className="mt-2 inline-flex items-center justify-center rounded-2xl bg-coral px-8 py-3 font-body text-base font-semibold text-white transition-colors hover:bg-coral/90"
+          className="mt-2 inline-flex items-center justify-center rounded-2xl px-8 py-3 font-body text-base font-semibold text-white transition-colors hover:opacity-90"
+          style={{ backgroundColor: '#2E86AB' }}
         >
           {t('tracking.backToMap')}
         </button>
@@ -175,7 +177,7 @@ export function OrderTrackingPage() {
         {/* Back button overlay */}
         <button
           onClick={() => navigate('/app/pedidos')}
-          className="absolute left-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-white px-3 py-2 font-body text-sm font-semibold text-gray-700 shadow-md hover:bg-gray-50"
+          className="absolute left-4 top-4 z-10 flex items-center gap-1.5 rounded-full bg-white px-3 py-2 font-body text-sm font-semibold text-[#1A1A2E] shadow-md hover:bg-[#FAFAF8]"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -185,7 +187,7 @@ export function OrderTrackingPage() {
 
         {/* "No location yet" banner */}
         {!vendorLocation && !isPending && (
-          <div className="absolute left-1/2 top-16 z-10 -translate-x-1/2 rounded-full bg-white/90 px-4 py-2 font-body text-sm text-gray-600 shadow-md">
+          <div className="absolute left-1/2 top-16 z-10 -translate-x-1/2 rounded-full bg-white/90 px-4 py-2 font-body text-sm text-[#6B7280] shadow-md">
             {t('tracking.noLocation')}
           </div>
         )}
@@ -203,17 +205,17 @@ export function OrderTrackingPage() {
               className="h-12 w-12 shrink-0 rounded-xl object-cover"
             />
           ) : (
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sand-100 text-xl">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl" style={{ backgroundColor: '#F5E6D3' }}>
               {order.vendor?.category
                 ? CATEGORY_EMOJI[order.vendor.category as VendorCategory]
                 : '🛍️'}
             </div>
           )}
           <div className="min-w-0">
-            <p className="truncate font-display font-semibold text-gray-900">
+            <p className="truncate font-display font-semibold text-[#1A1A2E]">
               {order.vendor?.display_name}
             </p>
-            <p className="font-body text-xs text-gray-400">
+            <p className="font-body text-xs text-[#6B7280]">
               R$ {order.total_brl.toFixed(2).replace('.', ',')}
               {' · '}
               {order.order_items?.length ?? 0}{' '}
@@ -224,17 +226,17 @@ export function OrderTrackingPage() {
 
         {/* Status area */}
         {isPending && (
-          <div className="flex items-center gap-2.5 rounded-xl bg-yellow-50 p-3">
+          <div className="flex items-center gap-2.5 rounded-xl p-3" style={{ backgroundColor: '#F5E6D3' }}>
             <Spinner size="sm" />
-            <p className="font-body text-sm text-yellow-700">
+            <p className="font-body text-sm" style={{ color: '#2E86AB' }}>
               {t('tracking.waitingConfirmation')}
             </p>
           </div>
         )}
 
         {isCancelled && (
-          <div className="rounded-xl bg-red-50 p-3">
-            <p className="font-body text-sm text-red-700">Pedido cancelado.</p>
+          <div className="rounded-xl p-3" style={{ backgroundColor: 'rgba(230,57,70,0.08)' }}>
+            <p className="font-body text-sm" style={{ color: '#E63946' }}>Pedido cancelado.</p>
           </div>
         )}
 
@@ -248,13 +250,12 @@ export function OrderTrackingPage() {
                   <div className="flex flex-col items-center gap-1.5">
                     {/* Circle */}
                     <div
-                      className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all ${
-                        done
-                          ? 'bg-coral text-white'
-                          : active
-                            ? 'bg-coral text-white ring-2 ring-coral ring-offset-2'
-                            : 'bg-gray-100 text-gray-400'
-                      }`}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-all"
+                      style={{
+                        backgroundColor: done || active ? '#2E86AB' : '#E8E8E4',
+                        color: done || active ? 'white' : '#6B7280',
+                        boxShadow: active ? '0 0 0 3px white, 0 0 0 5px #2E86AB' : undefined,
+                      }}
                     >
                       {done ? (
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -266,13 +267,11 @@ export function OrderTrackingPage() {
                     </div>
                     {/* Label */}
                     <span
-                      className={`whitespace-nowrap font-body text-xs ${
-                        active
-                          ? 'font-semibold text-coral'
-                          : done
-                            ? 'text-gray-600'
-                            : 'text-gray-400'
-                      }`}
+                      className="whitespace-nowrap font-body text-xs"
+                      style={{
+                        color: active ? '#2E86AB' : done ? '#1A1A2E' : '#6B7280',
+                        fontWeight: active ? 600 : undefined,
+                      }}
                     >
                       {t(`tracking.step.${step}`)}
                     </span>
@@ -281,9 +280,8 @@ export function OrderTrackingPage() {
                   {/* Connector line */}
                   {i < STEPS.length - 1 && (
                     <div
-                      className={`mx-1 mb-8 h-0.5 flex-1 rounded-full transition-colors ${
-                        done ? 'bg-coral' : 'bg-gray-200'
-                      }`}
+                      className="mx-1 mb-8 h-0.5 flex-1 rounded-full transition-colors"
+                      style={{ backgroundColor: done ? '#2E86AB' : '#E8E8E4' }}
                     />
                   )}
                 </div>
@@ -294,7 +292,7 @@ export function OrderTrackingPage() {
 
         {/* Delivery location */}
         {order.delivery_location && (
-          <p className="flex items-center gap-1 font-body text-xs text-gray-500">
+          <p className="flex items-center gap-1 font-body text-xs text-[#6B7280]">
             <span>📍</span>
             {order.delivery_location}
           </p>

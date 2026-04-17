@@ -11,10 +11,12 @@ interface OrderCardProps {
   onTrack?: (orderId: string) => void
   onNavigate?: (order: Order) => void
   onOpenChat?: (orderId: string) => void
+  onReview?: (orderId: string, vendorId: string) => void
   unreadCount?: number
+  isReviewed?: boolean
 }
 
-export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, onOpenChat, unreadCount }: OrderCardProps) {
+export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, onOpenChat, onReview, unreadCount, isReviewed }: OrderCardProps) {
   const { t } = useTranslation()
   const createdAt = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
@@ -94,6 +96,20 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, on
             <Button size="sm" variant="ghost" onClick={() => onTrack(order.id)}>
               📍 {t('tracking.trackButton')}
             </Button>
+          )}
+          {/* Review button — frequentador, delivered orders only */}
+          {role === 'frequentador'
+            && order.status === 'delivered'
+            && onReview && (
+            isReviewed ? (
+              <span className="text-xs font-body font-semibold text-[#6B7280] flex items-center gap-1">
+                ★ Avaliado
+              </span>
+            ) : (
+              <Button size="sm" variant="ghost" onClick={() => onReview(order.id, order.vendor_id)}>
+                ⭐ Avaliar
+              </Button>
+            )
           )}
           {/* Navigate button — shown when vendor is delivering or confirmed */}
           {role === 'vendedor'

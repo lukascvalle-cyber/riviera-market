@@ -68,7 +68,10 @@ export function useVendorLocation() {
           { event: 'UPDATE', schema: 'public', table: 'vendors' },
           () => { fetchActiveVendors() },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[useVendorLocation] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[useVendorLocation] Channel error')
+        })
     } catch (err) {
       console.error('[useVendorLocation] Realtime subscription error:', err)
     }

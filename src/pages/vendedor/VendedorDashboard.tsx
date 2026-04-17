@@ -79,7 +79,10 @@ export function VendedorDashboard() {
             setCountdown(60)
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[new-order-alert] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[new-order-alert] CHANNEL_ERROR, vendor:', vendor?.id)
+        })
     } catch (err) {
       console.error('[new-order-alert] Realtime subscription error:', err)
     }
@@ -135,7 +138,10 @@ export function VendedorDashboard() {
             )
           },
         )
-        .subscribe()
+        .subscribe((status, err) => {
+          if (err) console.error('[vendor-messages] Realtime error:', err)
+          else if (status === 'CHANNEL_ERROR') console.error('[vendor-messages] CHANNEL_ERROR, user:', user?.id)
+        })
     } catch (err) {
       console.error('[vendor-messages] Realtime subscription error:', err)
     }

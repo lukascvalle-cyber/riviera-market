@@ -21,6 +21,7 @@ export function AdminApp() {
   const NAV = [
     { to: '/admin', label: t('nav.dashboard'), icon: '📊', end: true, badge: 0 },
     { to: '/admin/mapa', label: t('nav.liveMap'), icon: '🗺️', end: false, badge: 0 },
+    { to: '/admin/clientes', label: 'Clientes', icon: '🏖️', end: false, badge: 0 },
     { to: '/admin/cadastros', label: t('nav.applications'), icon: '📝', end: false, badge: pendingCount },
     { to: '/admin/vendedores', label: t('nav.vendors'), icon: '🛍️', end: false, badge: 0 },
     { to: '/admin/pedidos', label: t('nav.orders'), icon: '📦', end: false, badge: 0 },

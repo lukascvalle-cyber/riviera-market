@@ -5,6 +5,8 @@ import { supabase } from '../../lib/supabase'
 import { MenuItemCard } from '../../components/vendor/MenuItemCard'
 import { CartDrawer } from '../../components/order/CartDrawer'
 import { Spinner } from '../../components/ui/Spinner'
+import { StarRating } from '../../components/ui/StarRating'
+import { useVendorReviews } from '../../hooks/useVendorReviews'
 import { CATEGORY_EMOJI } from '../../lib/constants'
 import { useCart } from '../../contexts/CartContext'
 import type { Vendor, Product } from '../../types'
@@ -19,6 +21,7 @@ export function VendorProfilePage() {
   const [loading, setLoading] = useState(true)
   const [cartOpen, setCartOpen] = useState(false)
   const { itemCount } = useCart()
+  const { avgRating, reviewCount } = useVendorReviews(vendorId ?? null)
 
   useEffect(() => {
     if (!vendorId) return
@@ -55,6 +58,13 @@ export function VendorProfilePage() {
           <div>
             <h1 className="font-display font-bold text-[#1A1A2E] text-lg leading-tight">{vendor.display_name}</h1>
             <p className="text-sm text-[#6B7280] font-body">{t(`categories.${vendor.category as VendorCategory}`)}</p>
+            {avgRating !== null && (
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <StarRating rating={avgRating} size="sm" />
+                <span className="text-xs font-body font-semibold" style={{ color: '#2E86AB' }}>{avgRating.toFixed(1)}</span>
+                <span className="text-xs text-[#6B7280] font-body">({reviewCount})</span>
+              </div>
+            )}
           </div>
           <div className="ml-auto relative">
             <button
