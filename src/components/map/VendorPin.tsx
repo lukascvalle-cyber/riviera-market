@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
-import { CATEGORY_COLORS, CATEGORY_EMOJI } from '../../lib/constants'
+import { CATEGORY_EMOJI } from '../../lib/constants'
 import type { VendorWithLocation } from '../../types'
 
 interface VendorPinProps {

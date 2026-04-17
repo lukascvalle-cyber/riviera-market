@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { useCart } from '../../contexts/CartContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrders } from '../../hooks/useOrders'
-import { Button } from '../ui/Button'
 import { useToast } from '../ui/Toast'
 import rivieraBuildings from '../../data/riviera-buildings.json'
 
