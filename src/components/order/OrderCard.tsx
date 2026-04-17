@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { MessageCircle } from 'lucide-react'
 import { OrderStatusBadge } from './OrderStatusBadge'
 import { Button } from '../ui/Button'
 import { CATEGORY_EMOJI } from '../../lib/constants'
@@ -78,12 +79,13 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, on
           {['pending', 'confirmed', 'delivering'].includes(order.status) && onOpenChat && (
             <button
               onClick={() => onOpenChat(order.id)}
-              className="relative w-10 h-10 rounded-full bg-[#F5E6D3]/60 flex items-center justify-center hover:bg-[#F5E6D3] transition-colors text-[#6B7280] shrink-0"
-              aria-label="Abrir chat"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium hover:bg-blue-50 transition-colors relative shrink-0"
+              style={{ borderColor: '#2E86AB', color: '#2E86AB' }}
             >
-              💬
+              <MessageCircle className="w-4 h-4" />
+              Mensagens
               {(unreadCount ?? 0) > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#E63946] text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {(unreadCount ?? 0) > 9 ? '9+' : unreadCount}
                 </span>
               )}
