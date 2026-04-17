@@ -85,8 +85,8 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'fill',
           source: 'modulo-8',
           paint: {
-            'fill-color': '#0ea5e9',
-            'fill-opacity': 0.15,
+            'fill-color': '#2E86AB',
+            'fill-opacity': 0.08,
           },
         })
 
@@ -95,7 +95,7 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'line',
           source: 'modulo-8',
           paint: {
-            'line-color': '#0ea5e9',
+            'line-color': '#2E86AB',
             'line-width': 2,
           },
         })
@@ -106,11 +106,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-8',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
@@ -143,8 +143,8 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'fill',
           source: 'modulo-7',
           paint: {
-            'fill-color': '#0ea5e9',
-            'fill-opacity': 0.15,
+            'fill-color': '#2E86AB',
+            'fill-opacity': 0.08,
           },
         })
 
@@ -153,7 +153,7 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'line',
           source: 'modulo-7',
           paint: {
-            'line-color': '#0ea5e9',
+            'line-color': '#2E86AB',
             'line-width': 2,
           },
         })
@@ -164,11 +164,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-7',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
@@ -198,8 +198,8 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'fill',
           source: 'modulo-6',
           paint: {
-            'fill-color': '#0ea5e9',
-            'fill-opacity': 0.15,
+            'fill-color': '#2E86AB',
+            'fill-opacity': 0.08,
           },
         })
 
@@ -208,7 +208,7 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'line',
           source: 'modulo-6',
           paint: {
-            'line-color': '#0ea5e9',
+            'line-color': '#2E86AB',
             'line-width': 2,
           },
         })
@@ -219,11 +219,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-6',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
@@ -253,8 +253,8 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'fill',
           source: 'modulo-5',
           paint: {
-            'fill-color': '#0ea5e9',
-            'fill-opacity': 0.15,
+            'fill-color': '#2E86AB',
+            'fill-opacity': 0.08,
           },
         })
 
@@ -263,7 +263,7 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           type: 'line',
           source: 'modulo-5',
           paint: {
-            'line-color': '#0ea5e9',
+            'line-color': '#2E86AB',
             'line-width': 2,
           },
         })
@@ -274,11 +274,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-5',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
@@ -307,14 +307,14 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           id: 'modulo-4-fill',
           type: 'fill',
           source: 'modulo-4',
-          paint: { 'fill-color': '#0ea5e9', 'fill-opacity': 0.15 },
+          paint: { 'fill-color': '#2E86AB', 'fill-opacity': 0.08 },
         })
 
         map.addLayer({
           id: 'modulo-4-outline',
           type: 'line',
           source: 'modulo-4',
-          paint: { 'line-color': '#0ea5e9', 'line-width': 2 },
+          paint: { 'line-color': '#2E86AB', 'line-width': 2 },
         })
 
         map.addLayer({
@@ -323,11 +323,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-4',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
@@ -359,14 +359,14 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           id: 'modulo-3-fill',
           type: 'fill',
           source: 'modulo-3',
-          paint: { 'fill-color': '#0ea5e9', 'fill-opacity': 0.15 },
+          paint: { 'fill-color': '#2E86AB', 'fill-opacity': 0.08 },
         })
 
         map.addLayer({
           id: 'modulo-3-outline',
           type: 'line',
           source: 'modulo-3',
-          paint: { 'line-color': '#0ea5e9', 'line-width': 2 },
+          paint: { 'line-color': '#2E86AB', 'line-width': 2 },
         })
 
         map.addLayer({
@@ -375,11 +375,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-3',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },
@@ -410,14 +410,14 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           id: 'modulo-2-fill',
           type: 'fill',
           source: 'modulo-2',
-          paint: { 'fill-color': '#0ea5e9', 'fill-opacity': 0.15 },
+          paint: { 'fill-color': '#2E86AB', 'fill-opacity': 0.08 },
         })
 
         map.addLayer({
           id: 'modulo-2-outline',
           type: 'line',
           source: 'modulo-2',
-          paint: { 'line-color': '#0ea5e9', 'line-width': 2 },
+          paint: { 'line-color': '#2E86AB', 'line-width': 2 },
         })
 
         map.addLayer({
@@ -426,11 +426,11 @@ export const BeachMap = forwardRef<BeachMapHandle, BeachMapProps>(
           source: 'modulo-2',
           layout: {
             'text-field': ['get', 'name'],
-            'text-size': 14,
+            'text-size': 13,
             'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
           },
           paint: {
-            'text-color': '#0ea5e9',
+            'text-color': '#2E86AB',
             'text-halo-color': '#ffffff',
             'text-halo-width': 2,
           },

@@ -34,7 +34,7 @@ function ProductCard({ product }: { product: Product }) {
   const qty = items.find(i => i.product.id === product.id)?.quantity ?? 0
 
   return (
-    <div className="bg-white rounded-2xl p-4 flex gap-3 border border-gray-100 shadow-sm">
+    <div className="bg-white p-4 flex gap-3 border-b border-[#E8E8E4]">
       {product.photo_url && (
         <img
           src={product.photo_url}
@@ -43,16 +43,16 @@ function ProductCard({ product }: { product: Product }) {
         />
       )}
       <div className="flex-1 min-w-0 flex flex-col gap-1">
-        <p className="font-body font-semibold text-gray-900 text-[15px] leading-snug">
+        <p className="font-body font-semibold text-[#1A1A2E] text-[15px] leading-snug">
           {product.name}
         </p>
         {product.description && (
-          <p className="font-body text-xs text-gray-400 leading-relaxed line-clamp-2">
+          <p className="font-body text-sm text-[#6B7280] leading-relaxed line-clamp-2">
             {product.description}
           </p>
         )}
         <div className="flex items-center justify-between mt-auto pt-2">
-          <p className="font-body font-bold text-green-600 text-base">
+          <p className="font-body font-bold text-[#2E86AB] text-base">
             R${' '}{product.price_brl.toFixed(2).replace('.', ',')}
           </p>
           {qty === 0 ? (
@@ -62,9 +62,10 @@ function ProductCard({ product }: { product: Product }) {
               title={!canAdd ? t('cart.clearCartTooltip') : undefined}
               className={`w-9 h-9 rounded-full flex items-center justify-center text-xl font-bold transition-colors ${
                 canAdd
-                  ? 'bg-coral text-white hover:bg-coral/90'
-                  : 'bg-gray-100 text-gray-300 cursor-not-allowed'
+                  ? 'text-white hover:opacity-90'
+                  : 'bg-[#E8E8E4] text-[#6B7280] cursor-not-allowed'
               }`}
+              style={canAdd ? { backgroundColor: '#2E86AB' } : undefined}
             >
               +
             </button>
@@ -72,16 +73,18 @@ function ProductCard({ product }: { product: Product }) {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => updateQuantity(product.id, qty - 1)}
-                className="w-8 h-8 rounded-full bg-coral/10 text-coral flex items-center justify-center font-bold text-lg hover:bg-coral/20 transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-lg transition-colors"
+                style={{ backgroundColor: 'rgba(46,134,171,0.1)', color: '#2E86AB' }}
               >
                 −
               </button>
-              <span className="w-5 text-center font-body font-bold text-gray-900 text-sm">
+              <span className="w-5 text-center font-body font-bold text-[#1A1A2E] text-sm">
                 {qty}
               </span>
               <button
                 onClick={() => addItem(product)}
-                className="w-8 h-8 rounded-full bg-coral text-white flex items-center justify-center font-bold text-lg hover:bg-coral/90 transition-colors"
+                className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-lg transition-colors hover:opacity-90"
+                style={{ backgroundColor: '#2E86AB' }}
               >
                 +
               </button>
@@ -144,9 +147,9 @@ export function MapView() {
     if (!map) return
     const el = document.createElement('div')
     el.style.cssText = `
-      width: 34px; height: 34px; border-radius: 50%;
-      background: #3b82f6; border: 3px solid white;
-      box-shadow: 0 2px 8px rgba(59,130,246,0.45);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: white; border: 2px solid #52B788;
+      box-shadow: 0 2px 8px rgba(82,183,136,0.35);
       display: flex; align-items: center; justify-content: center;
       font-size: 15px;
     `
@@ -279,7 +282,7 @@ export function MapView() {
 
       {/* ── Loading pill ── */}
       {mapLoading && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-body text-gray-600 shadow-md z-10 pointer-events-none">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-body text-[#6B7280] shadow-md z-10 pointer-events-none">
           {t('map.loading')}
         </div>
       )}
@@ -292,7 +295,7 @@ export function MapView() {
           transform: showOfflineMsg ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(-8px)',
         }}
       >
-        <div className="bg-gray-900/90 text-white rounded-full px-5 py-2.5 text-sm font-body shadow-lg whitespace-nowrap">
+        <div className="bg-[#1A1A2E]/90 text-white rounded-full px-5 py-2.5 text-sm font-body shadow-lg whitespace-nowrap">
           Este vendedor está offline no momento
         </div>
       </div>
@@ -303,16 +306,17 @@ export function MapView() {
           <div className="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs text-center flex flex-col gap-4">
             <div className="text-5xl">🚶</div>
             <div>
-              <h3 className="font-display text-xl font-bold text-gray-900">
+              <h3 className="font-display text-xl font-bold text-[#1A1A2E]">
                 O seu pedido está a chegar!
               </h3>
-              <p className="font-body text-sm text-gray-500 mt-1">
+              <p className="font-body text-sm text-[#6B7280] mt-1">
                 O vendedor está a menos de 50 metros.
               </p>
             </div>
             <button
               onClick={() => setProximityAlert(false)}
-              className="w-full bg-coral text-white rounded-2xl py-3 font-body font-semibold hover:bg-coral/90 transition-colors"
+              className="w-full text-white rounded-2xl py-3 font-body font-semibold transition-colors hover:opacity-90"
+              style={{ backgroundColor: '#2E86AB' }}
             >
               OK, estou a ver!
             </button>
@@ -320,18 +324,24 @@ export function MapView() {
         </div>
       )}
 
-      {/* ── Floating cart bar (iFood-style) ── */}
+      {/* ── Floating cart bar ── */}
       {itemCount > 0 && (
         <button
           onClick={() => setCartOpen(true)}
-          className="absolute left-1/2 -translate-x-1/2 z-[22] bg-coral text-white rounded-full shadow-xl flex items-center gap-3 font-body font-semibold text-sm whitespace-nowrap transition-all duration-200"
-          style={{ bottom: `${PEEK_PX + 12}px`, padding: '12px 20px' }}
+          className="absolute left-1/2 -translate-x-1/2 z-[22] text-white font-body font-semibold text-sm whitespace-nowrap transition-all duration-200 flex items-center gap-3"
+          style={{
+            bottom: `${PEEK_PX + 12}px`,
+            padding: '14px 24px',
+            borderRadius: 9999,
+            backgroundColor: '#2E86AB',
+            boxShadow: '0 4px 16px rgba(46,134,171,0.3)',
+          }}
           aria-label={t('map.viewCart')}
         >
           <span className="bg-white/25 rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shrink-0">
             {itemCount}
           </span>
-          <span>{t('cart.title')}</span>
+          <span>Ver carrinho</span>
           <span className="opacity-60 mx-0.5">·</span>
           <span>R${' '}{total.toFixed(2).replace('.', ',')}</span>
         </button>
@@ -339,7 +349,7 @@ export function MapView() {
 
       {/* ── Bottom sheet ── */}
       <div
-        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl flex flex-col z-20"
+        className="absolute bottom-0 left-0 right-0 bg-white rounded-t-[20px] shadow-2xl flex flex-col z-20"
         style={{
           height: '70vh',
           transform: sheetState === 'peek'
@@ -348,57 +358,60 @@ export function MapView() {
           transition: 'transform 0.3s ease-out',
         }}
       >
+        {/* Handle */}
         <button
           type="button"
           className="flex justify-center items-center pt-3 pb-1 w-full shrink-0"
           onClick={() => setSheetState(s => s === 'peek' ? 'expanded' : 'peek')}
           aria-label="Expandir lista de vendedores"
         >
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+          <div className="w-8 h-1 rounded-full bg-[#E8E8E4]" />
         </button>
 
+        {/* Sheet header */}
         <div className="px-5 pt-2 pb-3 shrink-0 flex items-center justify-between">
-          <p className="font-display font-bold text-gray-900 text-base">Vendedores</p>
+          <p className="font-display font-bold text-[#1A1A2E] text-base">Vendedores</p>
           {onlineCount > 0 && (
-            <span className="flex items-center gap-1.5 text-xs font-semibold font-body text-green-600">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="flex items-center gap-1.5 text-xs font-semibold font-body" style={{ color: '#52B788' }}>
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: '#52B788' }} />
               {onlineCount} online
             </span>
           )}
         </div>
 
+        {/* Vendor list */}
         <div className="overflow-y-auto flex-1 px-4 pb-6">
           {allVendors.length === 0 ? (
-            <p className="text-center text-gray-400 font-body text-sm py-8">
+            <p className="text-center text-[#6B7280] font-body text-sm py-8">
               {t('map.noActive')}
             </p>
           ) : (
-            <div className="flex flex-col divide-y divide-gray-100">
+            <div className="flex flex-col divide-y divide-[#E8E8E4]">
               {allVendors.map(vendor => (
                 <button
                   key={vendor.id}
                   type="button"
                   onClick={() => handleVendorListClick(vendor)}
                   className={`flex items-center gap-3 py-3.5 w-full text-left transition-opacity ${
-                    !vendor.is_active ? 'opacity-40' : ''
+                    !vendor.is_active ? 'opacity-[0.45]' : ''
                   }`}
                 >
                   <div
                     className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
-                    style={{ background: vendor.is_active ? CATEGORY_COLORS[vendor.category] : '#D1D5DB' }}
+                    style={{ background: vendor.is_active ? CATEGORY_COLORS[vendor.category] : '#E8E8E4' }}
                   >
                     {CATEGORY_EMOJI[vendor.category]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-body font-semibold truncate ${vendor.is_active ? 'text-gray-900' : 'text-gray-500'}`}>
+                    <p className={`font-body font-semibold truncate ${vendor.is_active ? 'text-[#1A1A2E]' : 'text-[#6B7280]'}`}>
                       {vendor.display_name}
                     </p>
-                    <p className="text-xs text-gray-400 font-body">
+                    <p className="text-xs text-[#6B7280] font-body">
                       {t(`categories.${vendor.category}`)}
                     </p>
                   </div>
                   {vendor.is_active && (
-                    <span className="w-2.5 h-2.5 rounded-full bg-green-500 shrink-0" />
+                    <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: '#52B788' }} />
                   )}
                 </button>
               ))}
@@ -419,17 +432,20 @@ export function MapView() {
       {/* ── Product drawer ── */}
       {drawerOpen && selectedVendor && (
         <div
-          className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-3xl shadow-2xl flex flex-col"
+          className="absolute bottom-0 left-0 right-0 z-30 bg-white rounded-t-[20px] shadow-2xl flex flex-col"
           style={{
             maxHeight: '85%',
             transform: drawerVisible ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.3s ease-out',
           }}
         >
+          {/* Handle */}
           <div className="flex justify-center pt-3 pb-1 shrink-0">
-            <div className="w-10 h-1 rounded-full bg-gray-300" />
+            <div className="w-8 h-1 rounded-full bg-[#E8E8E4]" />
           </div>
-          <div className="flex items-center gap-3 px-5 pb-4 pt-2 border-b border-gray-100 shrink-0">
+
+          {/* Vendor header */}
+          <div className="flex items-center gap-3 px-5 pb-4 pt-2 border-b border-[#E8E8E4] shrink-0">
             <div
               className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl shrink-0"
               style={{ background: CATEGORY_COLORS[selectedVendor.category] }}
@@ -438,28 +454,31 @@ export function MapView() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="font-display font-bold text-gray-900 text-lg leading-tight truncate">
+                <h2 className="font-display font-bold text-[#1A1A2E] text-lg leading-tight truncate">
                   {selectedVendor.display_name}
                 </h2>
-                <span className="w-2 h-2 rounded-full bg-green-500 shrink-0" />
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: '#52B788' }} />
               </div>
-              <p className="text-xs text-gray-400 font-body">
+              <p className="text-xs text-[#6B7280] font-body">
                 {t(`categories.${selectedVendor.category}`)}
               </p>
             </div>
             <button
               onClick={closeDrawer}
-              className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 font-body shrink-0 hover:bg-gray-200 transition-colors"
+              className="w-9 h-9 rounded-full flex items-center justify-center text-[#6B7280] font-body shrink-0 transition-colors"
+              style={{ backgroundColor: '#F5E6D3' }}
               aria-label={t('common.close')}
             >
               ✕
             </button>
           </div>
-          <div className="overflow-y-auto flex-1 px-4 py-4 flex flex-col gap-3">
+
+          {/* Products */}
+          <div className="overflow-y-auto flex-1 flex flex-col">
             {productsLoading ? (
               <div className="flex justify-center py-10"><Spinner size="md" /></div>
             ) : products.length === 0 ? (
-              <p className="text-center text-gray-400 font-body text-sm py-10">
+              <p className="text-center text-[#6B7280] font-body text-sm py-10">
                 {t('vendor.noProducts')}
               </p>
             ) : (

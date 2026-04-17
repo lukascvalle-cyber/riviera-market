@@ -11,10 +11,10 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<Variant, string> = {
-  primary: 'bg-coral text-white hover:bg-coral-500 active:bg-coral-600 disabled:bg-coral-200',
-  secondary: 'bg-ocean text-white hover:bg-ocean-500 active:bg-ocean-600 disabled:bg-ocean-200',
-  ghost: 'bg-transparent text-coral border border-coral hover:bg-coral-50 disabled:opacity-40',
-  danger: 'bg-red-600 text-white hover:bg-red-700 active:bg-red-800 disabled:bg-red-200',
+  primary: 'bg-[#2E86AB] text-white hover:bg-[#2E86AB]/90 active:bg-[#2E86AB]/80 disabled:bg-[#2E86AB]/40',
+  secondary: 'bg-transparent text-[#2E86AB] border border-[#2E86AB] hover:bg-[#2E86AB]/10 active:bg-[#2E86AB]/20 disabled:opacity-40',
+  ghost: 'bg-transparent text-[#2E86AB] border border-[#2E86AB] hover:bg-[#2E86AB]/10 disabled:opacity-40',
+  danger: 'bg-[#E63946] text-white hover:bg-[#E63946]/90 active:bg-[#E63946]/80 disabled:bg-[#E63946]/40',
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -30,7 +30,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         ref={ref}
         disabled={disabled || loading}
         className={[
-          'inline-flex items-center justify-center gap-2 rounded-xl font-body font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-coral focus-visible:ring-offset-2',
+          'inline-flex items-center justify-center gap-2 rounded-xl font-body font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#2E86AB] focus-visible:ring-offset-2',
           variantClasses[variant],
           sizeClasses[size],
           fullWidth ? 'w-full' : '',

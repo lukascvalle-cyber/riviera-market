@@ -14,18 +14,18 @@ export function VendedorApp() {
   ]
 
   return (
-    <div className="flex flex-col h-screen bg-sand">
-      <header className="bg-white border-b border-sand-200 flex items-center justify-between px-4 py-3 shrink-0">
+    <div className="flex flex-col h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+      <header className="bg-white border-b border-[#E8E8E4] flex items-center justify-between px-4 py-3 shrink-0">
         <div>
-          <span className="font-display font-bold text-coral text-lg">Riviera</span>
-          <span className="font-display text-ocean text-lg ml-1">Market</span>
+          <span className="font-display font-bold text-[#2E86AB] text-lg">Riviera</span>
+          <span className="font-display text-[#2E86AB] text-lg ml-1 opacity-70">Market</span>
           {vendor?.display_name && (
-            <span className="ml-2 text-sm text-gray-500 font-body">· {vendor.display_name}</span>
+            <span className="ml-2 text-sm text-[#6B7280] font-body">· {vendor.display_name}</span>
           )}
         </div>
         <div className="flex items-center gap-3">
           <LanguageSelector />
-          <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">
+          <button onClick={signOut} className="text-sm text-[#6B7280] hover:text-[#1A1A2E] font-body transition-colors">
             {t('common.logout')}
           </button>
         </div>
@@ -35,7 +35,7 @@ export function VendedorApp() {
         <Outlet />
       </main>
 
-      <nav className="bg-white border-t border-sand-200 flex shrink-0">
+      <nav className="bg-white border-t border-[#E8E8E4] flex shrink-0">
         {NAV.map(item => (
           <NavLink
             key={item.to}
@@ -43,7 +43,7 @@ export function VendedorApp() {
             end={item.end}
             className={({ isActive }) =>
               `flex-1 flex flex-col items-center py-3 gap-0.5 font-body text-xs font-semibold transition-colors ${
-                isActive ? 'text-coral' : 'text-gray-400'
+                isActive ? 'text-[#2E86AB]' : 'text-[#6B7280]'
               }`
             }
           >

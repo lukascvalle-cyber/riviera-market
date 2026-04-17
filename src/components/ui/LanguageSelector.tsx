@@ -22,14 +22,14 @@ export function LanguageSelector() {
             onClick={() => i18n.changeLanguage(lang.code)}
             className={`text-xs font-semibold font-body px-1 py-0.5 rounded transition-colors ${
               isActive(lang.code)
-                ? 'text-coral'
-                : 'text-gray-400 hover:text-gray-600'
+                ? 'text-[#2E86AB]'
+                : 'text-[#6B7280] hover:text-[#1A1A2E]'
             }`}
           >
             {lang.label}
           </button>
           {idx < LANGS.length - 1 && (
-            <span className="text-gray-200 text-xs select-none">|</span>
+            <span className="text-[#E8E8E4] text-xs select-none">|</span>
           )}
         </span>
       ))}

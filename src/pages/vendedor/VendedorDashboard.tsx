@@ -156,10 +156,10 @@ export function VendedorDashboard() {
       />
 
       <section>
-        <h2 className="font-display text-xl font-semibold text-gray-900 mb-3">
+        <h2 className="font-display text-xl font-semibold text-[#1A1A2E] mb-3">
           {t('orders.active')}
           {activeOrders.length > 0 && (
-            <span className="ml-2 bg-coral text-white text-sm px-2 py-0.5 rounded-full font-body font-bold">
+            <span className="ml-2 text-white text-sm px-2 py-0.5 rounded-full font-body font-bold inline-flex items-center" style={{ backgroundColor: '#2E86AB' }}>
               {activeOrders.length}
             </span>
           )}
@@ -167,7 +167,7 @@ export function VendedorDashboard() {
         {loading ? (
           <div className="flex justify-center py-8"><Spinner /></div>
         ) : activeOrders.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 font-body">
+          <div className="text-center py-8 text-[#6B7280] font-body">
             <p className="text-3xl mb-2">📭</p>
             <p>{t('orders.noPending')}</p>
           </div>
@@ -190,7 +190,7 @@ export function VendedorDashboard() {
 
       {pastOrders.length > 0 && (
         <section>
-          <h2 className="font-display text-lg font-semibold text-gray-700 mb-3">
+          <h2 className="font-display text-lg font-semibold text-[#6B7280] mb-3">
             {t('orders.history')}
           </h2>
           <div className="flex flex-col gap-3">
@@ -229,11 +229,11 @@ export function VendedorDashboard() {
           <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 flex flex-col gap-5">
             {/* Header */}
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-3">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'rgba(46,134,171,0.1)' }}>
                 <span className="text-3xl">🔔</span>
               </div>
-              <h3 className="font-display text-xl font-bold text-gray-900">Novo pedido!</h3>
-              <p className="text-sm text-gray-500 font-body mt-1">
+              <h3 className="font-display text-xl font-bold text-[#1A1A2E]">Novo pedido!</h3>
+              <p className="text-sm text-[#6B7280] font-body mt-1">
                 R${' '}{newOrderAlert.total_brl.toFixed(2).replace('.', ',')}
                 {newOrderAlert.delivery_location && (
                   <> · {newOrderAlert.delivery_location}</>
@@ -243,13 +243,13 @@ export function VendedorDashboard() {
 
             {/* Countdown bar */}
             <div className="flex flex-col gap-1">
-              <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-1.5 rounded-full bg-[#E8E8E4] overflow-hidden">
                 <div
-                  className="h-full bg-coral rounded-full transition-all duration-1000"
-                  style={{ width: `${(countdown / 60) * 100}%` }}
+                  className="h-full rounded-full transition-all duration-1000"
+                  style={{ width: `${(countdown / 60) * 100}%`, backgroundColor: '#2E86AB' }}
                 />
               </div>
-              <p className="text-xs text-center text-gray-400 font-body">
+              <p className="text-xs text-center text-[#6B7280] font-body">
                 Auto-recusa em {countdown}s
               </p>
             </div>

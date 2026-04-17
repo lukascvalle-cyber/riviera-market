@@ -25,16 +25,19 @@ export function OrdersManagementPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="font-display text-3xl font-bold text-gray-900 mb-6">{t('admin.orders')}</h1>
+      <h1 className="font-display text-3xl font-bold text-[#1A1A2E] mb-6">{t('admin.orders')}</h1>
 
       <div className="flex gap-2 mb-5 flex-wrap">
         {ALL_STATUSES.map(s => (
           <button
             key={s}
             onClick={() => { setLoading(true); setFilter(s) }}
-            className={`px-3 py-1.5 rounded-full text-sm font-semibold font-body border transition-all ${
-              filter === s ? 'bg-coral text-white border-coral' : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-            }`}
+            className={`px-3 py-1.5 rounded-full text-sm font-semibold font-body border transition-all`}
+            style={
+              filter === s
+                ? { backgroundColor: '#2E86AB', color: 'white', borderColor: '#2E86AB' }
+                : { backgroundColor: 'white', color: '#6B7280', borderColor: '#E8E8E4' }
+            }
           >
             {s === 'all' ? t('admin.all') : t(`orderStatus.${s}`)}
           </button>
@@ -44,30 +47,30 @@ export function OrdersManagementPage() {
       {loading ? (
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       ) : (
-        <div className="bg-white rounded-2xl border border-sand-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#E8E8E4] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <table className="w-full">
-            <thead className="bg-sand-50 border-b border-sand-200">
+            <thead className="border-b border-[#E8E8E4]" style={{ backgroundColor: '#FAFAF8' }}>
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.vendor')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.time')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.items')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.total')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.status')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.vendor')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.time')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.items')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.total')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.status')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-sand-100">
-              {orders.map(o => (
-                <tr key={o.id} className="hover:bg-sand-50 transition-colors">
-                  <td className="px-4 py-3 font-semibold font-body text-gray-900 text-sm">
+            <tbody className="divide-y divide-[#E8E8E4]">
+              {orders.map((o, idx) => (
+                <tr key={o.id} className="hover:bg-[#FAFAF8] transition-colors" style={{ backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FAFAF8' }}>
+                  <td className="px-4 py-3 font-semibold font-body text-[#1A1A2E] text-sm">
                     {o.vendor?.display_name ?? '—'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-500 font-body">
+                  <td className="px-4 py-3 text-sm text-[#6B7280] font-body">
                     {new Date(o.created_at).toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 font-body">
+                  <td className="px-4 py-3 text-sm text-[#6B7280] font-body">
                     {o.order_items?.length ?? 0} {t(`admin.items`).toLowerCase()}
                   </td>
-                  <td className="px-4 py-3 font-display font-bold text-coral text-sm">
+                  <td className="px-4 py-3 font-display font-bold text-[#2E86AB] text-sm">
                     R$ {o.total_brl.toFixed(2).replace('.', ',')}
                   </td>
                   <td className="px-4 py-3">
@@ -77,7 +80,7 @@ export function OrdersManagementPage() {
               ))}
               {orders.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="text-center py-12 text-gray-400 font-body">{t('admin.noOrders')}</td>
+                  <td colSpan={5} className="text-center py-12 text-[#6B7280] font-body">{t('admin.noOrders')}</td>
                 </tr>
               )}
             </tbody>

@@ -34,42 +34,42 @@ export function VendorsManagementPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="font-display text-3xl font-bold text-gray-900 mb-6">{t('admin.vendors')}</h1>
+      <h1 className="font-display text-3xl font-bold text-[#1A1A2E] mb-6">{t('admin.vendors')}</h1>
       {loading ? (
         <div className="flex justify-center py-16"><Spinner size="lg" /></div>
       ) : (
-        <div className="bg-white rounded-2xl border border-sand-200 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#E8E8E4] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
           <table className="w-full">
-            <thead className="bg-sand-50 border-b border-sand-200">
+            <thead className="border-b border-[#E8E8E4]" style={{ backgroundColor: '#FAFAF8' }}>
               <tr>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.vendor')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.category')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.status')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 font-body">{t('admin.action')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.vendor')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.category')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.status')}</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-[#6B7280] font-body uppercase tracking-wide">{t('admin.action')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-sand-100">
-              {vendors.map(v => (
-                <tr key={v.id} className="hover:bg-sand-50 transition-colors">
+            <tbody className="divide-y divide-[#E8E8E4]">
+              {vendors.map((v, idx) => (
+                <tr key={v.id} className="hover:bg-[#FAFAF8] transition-colors" style={{ backgroundColor: idx % 2 === 0 ? '#FFFFFF' : '#FAFAF8' }}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {v.logo_url ? (
                         <img src={v.logo_url} alt={v.display_name} className="w-9 h-9 rounded-xl object-cover" />
                       ) : (
-                        <div className="w-9 h-9 rounded-xl bg-sand-100 flex items-center justify-center text-lg">
+                        <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg" style={{ backgroundColor: '#F5E6D3' }}>
                           {CATEGORY_EMOJI[v.category]}
                         </div>
                       )}
-                      <span className="font-semibold font-body text-gray-900">{v.display_name}</span>
+                      <span className="font-semibold font-body text-[#1A1A2E]">{v.display_name}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-sm font-body text-gray-600">{t(`categories.${v.category as VendorCategory}`)}</td>
+                  <td className="px-4 py-3 text-sm font-body text-[#6B7280]">{t(`categories.${v.category as VendorCategory}`)}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
-                      <Badge className={v.is_approved ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                      <Badge className={v.is_approved ? 'bg-[#52B788]/15 text-[#52B788]' : 'bg-[#F5E6D3] text-[#2E86AB]'}>
                         {v.is_approved ? t('admin.approved') : t('admin.pending')}
                       </Badge>
-                      {v.is_active && <Badge className="bg-blue-100 text-blue-800">{t('admin.live')}</Badge>}
+                      {v.is_active && <Badge className="bg-[#2E86AB]/10 text-[#2E86AB]">{t('admin.live')}</Badge>}
                     </div>
                   </td>
                   <td className="px-4 py-3">

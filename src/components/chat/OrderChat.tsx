@@ -86,31 +86,33 @@ export function OrderChat({
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+          <div className="w-8 h-1 rounded-full bg-[#E8E8E4]" />
         </div>
 
         {/* Header */}
-        <div className="shrink-0 px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+        <div className="shrink-0 px-4 py-3 border-b border-[#E8E8E4] flex items-center justify-between">
           <div>
-            <p className="font-display font-semibold text-gray-900">
+            <p className="font-display font-semibold text-[#1A1A2E]">
               {partnerName ?? 'Chat do pedido'}
             </p>
-            <p className="text-xs text-gray-400 font-body">
+            <p className="text-xs text-[#6B7280] font-body">
               #{orderId.slice(-8).toUpperCase()}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+            className="w-9 h-9 rounded-full bg-[#F5E6D3]/60 flex items-center justify-center text-[#6B7280] hover:bg-[#F5E6D3] transition-colors"
           >
             ✕
           </button>
         </div>
 
-        {/* Completed banner */}
+        {/* Completed / cancelled banner */}
         {isClosed && (
-          <div className="shrink-0 px-4 py-2 bg-gray-50 border-b border-gray-100 text-center">
-            <p className="text-xs text-gray-400 font-body">
+          <div className="shrink-0 px-4 py-2 border-b border-[#E8E8E4] text-center"
+            style={{ backgroundColor: '#F5E6D3' }}
+          >
+            <p className="text-xs font-body" style={{ color: '#2E86AB' }}>
               {orderStatus === 'delivered'
                 ? '✓ Pedido concluído'
                 : '✕ Pedido cancelado'}{' '}
@@ -120,13 +122,13 @@ export function OrderChat({
         )}
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2">
+        <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2" style={{ backgroundColor: '#FAFAF8' }}>
           {loading ? (
             <div className="flex justify-center py-8">
               <Spinner size="sm" />
             </div>
           ) : messages.length === 0 ? (
-            <p className="text-center text-gray-400 font-body text-sm py-8">
+            <p className="text-center text-[#6B7280] font-body text-sm py-8">
               Sem mensagens ainda. Diga olá! 👋
             </p>
           ) : (
@@ -142,19 +144,21 @@ export function OrderChat({
                   className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                    className={`max-w-[75%] px-4 py-2.5 ${
                       isOwn
-                        ? 'bg-ocean text-white rounded-br-sm'
-                        : 'bg-gray-100 text-gray-900 rounded-bl-sm'
+                        ? 'text-white rounded-[16px_16px_4px_16px]'
+                        : 'text-[#1A1A2E] rounded-[16px_16px_16px_4px]'
                     }`}
+                    style={{
+                      backgroundColor: isOwn ? '#2E86AB' : '#F5E6D3',
+                    }}
                   >
                     <p className="font-body text-sm leading-relaxed break-words">
                       {msg.message}
                     </p>
                     <p
-                      className={`text-[10px] mt-1 text-right ${
-                        isOwn ? 'text-white/60' : 'text-gray-400'
-                      }`}
+                      className={`text-[11px] mt-1 text-right`}
+                      style={{ color: isOwn ? 'rgba(255,255,255,0.6)' : '#6B7280' }}
                     >
                       {time}
                     </p>
@@ -169,7 +173,7 @@ export function OrderChat({
         {/* Input — hidden for closed orders */}
         {!isClosed && (
           <div
-            className="shrink-0 px-4 pt-3 pb-4 bg-white border-t border-gray-100 flex items-end gap-2"
+            className="shrink-0 px-4 pt-3 pb-4 bg-white border-t border-[#E8E8E4] flex items-end gap-2"
             style={{ paddingBottom: 'max(16px, env(safe-area-inset-bottom))' }}
           >
             <textarea
@@ -179,13 +183,14 @@ export function OrderChat({
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Mensagem…"
-              className="flex-1 rounded-2xl border border-gray-200 px-4 py-2.5 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ocean resize-none leading-relaxed"
+              className="flex-1 rounded-2xl border border-[#E8E8E4] px-4 py-2.5 font-body text-sm text-[#1A1A2E] placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] resize-none leading-relaxed"
               style={{ maxHeight: 96, overflowY: 'auto' }}
             />
             <button
               onClick={handleSend}
               disabled={!input.trim() || sending}
-              className="w-10 h-10 rounded-full bg-ocean text-white flex items-center justify-center shrink-0 hover:bg-ocean/90 transition-colors disabled:opacity-40"
+              className="w-10 h-10 rounded-full text-white flex items-center justify-center shrink-0 transition-colors disabled:opacity-40"
+              style={{ backgroundColor: '#2E86AB' }}
               aria-label="Enviar mensagem"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">

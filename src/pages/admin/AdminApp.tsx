@@ -27,12 +27,12 @@ export function AdminApp() {
   ]
 
   return (
-    <div className="flex h-screen bg-sand">
+    <div className="flex h-screen" style={{ backgroundColor: '#FAFAF8' }}>
       {/* Sidebar */}
-      <aside className="w-56 bg-white border-r border-sand-200 flex flex-col shrink-0 hidden md:flex">
-        <div className="p-5 border-b border-sand-200">
-          <h1 className="font-display font-bold text-coral text-xl">Riviera</h1>
-          <p className="font-display text-ocean text-sm">Market · Admin</p>
+      <aside className="w-56 bg-white border-r border-[#E8E8E4] flex flex-col shrink-0 hidden md:flex">
+        <div className="p-5 border-b border-[#E8E8E4]">
+          <h1 className="font-display font-bold text-[#2E86AB] text-xl">Riviera</h1>
+          <p className="font-display text-[#2E86AB] text-sm opacity-70">Market · Admin</p>
         </div>
         <nav className="flex-1 p-3 flex flex-col gap-1">
           {NAV.map(item => (
@@ -42,23 +42,26 @@ export function AdminApp() {
               end={item.end}
               className={({ isActive }) =>
                 `flex items-center gap-2.5 px-3 py-2.5 rounded-xl font-body font-semibold text-sm transition-colors ${
-                  isActive ? 'bg-coral-50 text-coral' : 'text-gray-600 hover:bg-sand-50'
+                  isActive
+                    ? 'text-[#2E86AB]'
+                    : 'text-[#6B7280] hover:text-[#1A1A2E] hover:bg-[#FAFAF8]'
                 }`
               }
+              style={({ isActive }) => isActive ? { backgroundColor: '#F5E6D3' } : undefined}
             >
               <span>{item.icon}</span>
               <span className="flex-1">{item.label}</span>
               {item.badge > 0 && (
-                <span className="bg-coral text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0">
+                <span className="text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0" style={{ backgroundColor: '#2E86AB' }}>
                   {item.badge}
                 </span>
               )}
             </NavLink>
           ))}
         </nav>
-        <div className="p-4 border-t border-sand-200 flex items-center justify-between">
+        <div className="p-4 border-t border-[#E8E8E4] flex items-center justify-between">
           <LanguageSelector />
-          <button onClick={signOut} className="text-sm text-gray-400 hover:text-gray-600 font-body">
+          <button onClick={signOut} className="text-sm text-[#6B7280] hover:text-[#1A1A2E] font-body transition-colors">
             {t('common.logout')}
           </button>
         </div>
@@ -66,24 +69,24 @@ export function AdminApp() {
 
       {/* Mobile top nav */}
       <div className="flex flex-col flex-1 overflow-hidden">
-        <header className="bg-white border-b border-sand-200 flex items-center justify-between px-4 py-3 md:hidden shrink-0">
+        <header className="bg-white border-b border-[#E8E8E4] flex items-center justify-between px-4 py-3 md:hidden shrink-0">
           <div>
-            <span className="font-display font-bold text-coral">Riviera</span>
-            <span className="font-display text-ocean ml-1">· Admin</span>
+            <span className="font-display font-bold text-[#2E86AB]">Riviera</span>
+            <span className="font-display text-[#2E86AB] ml-1 opacity-70">· Admin</span>
           </div>
           <div className="flex items-center gap-3">
             <LanguageSelector />
-            <button onClick={signOut} className="text-sm text-gray-400 font-body">
+            <button onClick={signOut} className="text-sm text-[#6B7280] font-body">
               {t('common.logout')}
             </button>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto" style={{ backgroundColor: '#FAFAF8' }}>
           <Outlet />
         </main>
 
-        <nav className="bg-white border-t border-sand-200 flex md:hidden shrink-0">
+        <nav className="bg-white border-t border-[#E8E8E4] flex md:hidden shrink-0">
           {NAV.map(item => (
             <NavLink
               key={item.to}
@@ -91,14 +94,14 @@ export function AdminApp() {
               end={item.end}
               className={({ isActive }) =>
                 `flex-1 flex flex-col items-center py-2.5 gap-0.5 font-body text-xs font-semibold transition-colors ${
-                  isActive ? 'text-coral' : 'text-gray-400'
+                  isActive ? 'text-[#2E86AB]' : 'text-[#6B7280]'
                 }`
               }
             >
               <span className="relative text-lg">
                 {item.icon}
                 {item.badge > 0 && (
-                  <span className="absolute -top-1 -right-1.5 bg-coral text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1.5 text-white text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center" style={{ backgroundColor: '#2E86AB' }}>
                     {item.badge}
                   </span>
                 )}

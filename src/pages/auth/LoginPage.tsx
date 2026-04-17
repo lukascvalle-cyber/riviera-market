@@ -79,7 +79,7 @@ export function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo & Branding */}
         <div className="text-center mb-10">
-          <WaveIcon className="w-12 h-12 mx-auto mb-4" style={{ color: '#2E86AB' }} />
+          <WaveIcon className="w-12 h-12 mx-auto mb-4 text-[#2E86AB]" />
           <h1 className="text-2xl font-semibold tracking-tight" style={{ color: '#2E86AB' }}>
             Riviera Market
           </h1>

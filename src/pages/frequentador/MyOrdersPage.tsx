@@ -80,10 +80,10 @@ export function MyOrdersPage() {
   const chatOrder = orders.find(o => o.id === chatOrderId)
 
   return (
-    <div className="min-h-screen bg-sand pb-6">
-      <div className="bg-white border-b border-sand-200">
+    <div className="min-h-screen pb-6" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="bg-white border-b border-[#E8E8E4]">
         <div className="max-w-xl mx-auto px-4 py-5">
-          <h1 className="font-display text-2xl font-bold text-gray-900">{t('orders.title')}</h1>
+          <h1 className="font-display text-2xl font-bold text-[#1A1A2E]">{t('orders.title')}</h1>
         </div>
       </div>
       <div className="max-w-xl mx-auto px-4 py-5 flex flex-col gap-3">
@@ -92,7 +92,7 @@ export function MyOrdersPage() {
         ) : orders.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-4xl mb-3">🌊</p>
-            <p className="text-gray-500 font-body">{t('orders.empty')}</p>
+            <p className="text-[#6B7280] font-body">{t('orders.empty')}</p>
           </div>
         ) : (
           orders.map(o => (

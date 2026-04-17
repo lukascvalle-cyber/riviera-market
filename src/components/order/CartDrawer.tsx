@@ -123,20 +123,20 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
       >
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
-          <div className="w-10 h-1 rounded-full bg-gray-300" />
+          <div className="w-8 h-1 rounded-full bg-[#E8E8E4]" />
         </div>
 
         {/* Header */}
-        <div className="px-5 pb-4 pt-2 border-b border-gray-100 flex items-center justify-between shrink-0">
-          <h2 className="font-display text-xl font-semibold text-gray-900">
+        <div className="px-5 pb-4 pt-2 border-b border-[#E8E8E4] flex items-center justify-between shrink-0">
+          <h2 className="font-display text-xl font-semibold text-[#1A1A2E]">
             {t('cart.title')}
             {itemCount > 0 && (
-              <span className="ml-2 text-coral text-lg">({itemCount})</span>
+              <span className="ml-2 text-[#2E86AB] text-lg">({itemCount})</span>
             )}
           </h2>
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 transition-colors"
+            className="w-9 h-9 rounded-full bg-[#F5E6D3]/60 flex items-center justify-center text-[#6B7280] hover:bg-[#F5E6D3] transition-colors"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -147,19 +147,19 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
           {items.length === 0 ? (
-            <p className="text-center text-gray-400 font-body py-12">{t('cart.empty')}</p>
+            <p className="text-center text-[#6B7280] font-body py-12">{t('cart.empty')}</p>
           ) : (
             <div className="px-5 py-4 flex flex-col gap-5">
 
               {/* ── Item list ── */}
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col divide-y divide-[#E8E8E4]">
                 {items.map(item => (
-                  <div key={item.product.id} className="flex items-center gap-3">
+                  <div key={item.product.id} className="flex items-center gap-3 py-3">
                     <div className="flex-1 min-w-0">
-                      <p className="font-semibold font-body text-gray-900 text-[15px] leading-snug truncate">
+                      <p className="font-semibold font-body text-[#1A1A2E] text-[15px] leading-snug truncate">
                         {item.product.name}
                       </p>
-                      <p className="text-sm text-gray-400 font-body mt-0.5">
+                      <p className="text-sm text-[#6B7280] font-body mt-0.5">
                         R${' '}{item.product.price_brl.toFixed(2).replace('.', ',')}
                       </p>
                     </div>
@@ -167,22 +167,22 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                     <div className="flex items-center gap-2 shrink-0">
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                        className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors"
+                        className="w-8 h-8 rounded-full border border-[#E8E8E4] flex items-center justify-center text-[#2E86AB] font-bold hover:bg-[#2E86AB]/10 transition-colors"
                       >
                         −
                       </button>
-                      <span className="w-6 text-center font-bold font-body text-gray-900">
+                      <span className="w-6 text-center font-bold font-body text-[#1A1A2E]">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                        className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 font-bold transition-colors"
+                        className="w-8 h-8 rounded-full border border-[#E8E8E4] flex items-center justify-center text-[#2E86AB] font-bold hover:bg-[#2E86AB]/10 transition-colors"
                       >
                         +
                       </button>
                       <button
                         onClick={() => removeItem(item.product.id)}
-                        className="ml-1 w-7 h-7 flex items-center justify-center text-red-300 hover:text-red-500 transition-colors"
+                        className="ml-1 w-7 h-7 flex items-center justify-center text-[#E63946]/40 hover:text-[#E63946] transition-colors"
                       >
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -190,7 +190,7 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       </button>
                     </div>
                     {/* Subtotal */}
-                    <p className="text-sm font-bold font-body text-gray-900 w-16 text-right shrink-0">
+                    <p className="text-sm font-bold font-body text-[#1A1A2E] w-16 text-right shrink-0">
                       R${' '}{(item.product.price_brl * item.quantity).toFixed(2).replace('.', ',')}
                     </p>
                   </div>
@@ -198,28 +198,28 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
               </div>
 
               {/* ── Total ── */}
-              <div className="flex justify-between items-center border-t border-gray-100 pt-4">
-                <span className="font-display font-bold text-gray-900 text-lg">{t('cart.total')}</span>
-                <span className="font-display font-bold text-coral text-2xl">
+              <div className="flex justify-between items-center border-t border-[#E8E8E4] pt-4">
+                <span className="font-display font-bold text-[#1A1A2E] text-lg">{t('cart.total')}</span>
+                <span className="font-display font-bold text-[#1A1A2E] text-2xl">
                   R${' '}{total.toFixed(2).replace('.', ',')}
                 </span>
               </div>
 
               {/* ── Location ── */}
               <div className="flex flex-col gap-3">
-                <p className="text-sm font-semibold text-gray-700 font-body flex items-center gap-1.5">
+                <p className="text-sm font-semibold text-[#1A1A2E] font-body flex items-center gap-1.5">
                   📍 {t('cart.whereAreYou')}
                 </p>
 
                 {/* Módulo */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700 font-body">
-                    {t('cart.moduleLabel')} <span className="text-coral text-xs">*</span>
+                  <label className="text-sm font-semibold text-[#1A1A2E] font-body">
+                    {t('cart.moduleLabel')} <span className="text-[#2E86AB] text-xs">*</span>
                   </label>
                   <select
                     value={moduleNumber ?? ''}
                     onChange={e => setModuleNumber(e.target.value ? Number(e.target.value) : null)}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 font-body text-gray-900 focus:outline-none focus:ring-2 focus:ring-coral bg-white text-sm"
+                    className="w-full rounded-[10px] border border-[#E8E8E4] px-4 py-3 font-body text-[#1A1A2E] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] bg-white text-sm"
                   >
                     <option value="">{t('cart.modulePlaceholder')}</option>
                     {MODULES.map(m => (
@@ -230,14 +230,14 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
                 {/* Edifício */}
                 <div className="flex flex-col gap-1.5">
-                  <label className={`text-sm font-semibold font-body ${moduleNumber ? 'text-gray-700' : 'text-gray-400'}`}>
+                  <label className={`text-sm font-semibold font-body ${moduleNumber ? 'text-[#1A1A2E]' : 'text-[#6B7280]'}`}>
                     {t('cart.buildingLabel')}
                   </label>
                   <select
                     value={buildingName}
                     onChange={e => setBuildingName(e.target.value)}
                     disabled={!moduleNumber}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 font-body text-gray-900 focus:outline-none focus:ring-2 focus:ring-coral bg-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full rounded-[10px] border border-[#E8E8E4] px-4 py-3 font-body text-[#1A1A2E] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] bg-white text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <option value="">{t('cart.buildingPlaceholder')}</option>
                     {buildingOptions.map(b => (
@@ -250,14 +250,14 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       placeholder={t('cart.buildingOtherPlaceholder')}
                       value={buildingCustom}
                       onChange={e => setBuildingCustom(e.target.value)}
-                      className="mt-1 w-full rounded-xl border border-gray-200 px-4 py-3 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral"
+                      className="mt-1 w-full rounded-[10px] border border-[#E8E8E4] px-4 py-3 font-body text-sm text-[#1A1A2E] placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2E86AB]"
                     />
                   )}
                 </div>
 
                 {/* Apartamento */}
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-sm font-semibold text-gray-700 font-body">
+                  <label className="text-sm font-semibold text-[#1A1A2E] font-body">
                     {t('cart.apartmentLabel')}
                   </label>
                   <input
@@ -265,15 +265,15 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                     placeholder={t('cart.apartmentPlaceholder')}
                     value={apartmentNumber}
                     onChange={e => setApartmentNumber(e.target.value)}
-                    className="w-full rounded-xl border border-gray-200 px-4 py-3 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral"
+                    className="w-full rounded-[10px] border border-[#E8E8E4] px-4 py-3 font-body text-sm text-[#1A1A2E] placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2E86AB]"
                   />
                 </div>
               </div>
 
               {/* ── Payment method ── */}
               <div className="flex flex-col gap-3">
-                <p className="text-sm font-semibold text-gray-700 font-body">
-                  {t('cart.paymentMethod')} <span className="text-coral text-xs">*</span>
+                <p className="text-sm font-semibold text-[#1A1A2E] font-body">
+                  {t('cart.paymentMethod')} <span className="text-[#2E86AB] text-xs">*</span>
                 </p>
                 <div className="grid grid-cols-2 gap-2">
                   {PAYMENT_OPTIONS.map(opt => (
@@ -281,10 +281,10 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
                       key={opt.value}
                       type="button"
                       onClick={() => setPaymentMethod(opt.value)}
-                      className={`flex items-center gap-2.5 rounded-2xl border px-4 py-3 font-body text-sm font-semibold transition-colors ${
+                      className={`flex items-center gap-2.5 rounded-xl border px-4 py-3 font-body text-sm font-semibold transition-colors ${
                         paymentMethod === opt.value
-                          ? 'border-coral bg-coral/5 text-coral'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                          ? 'border-[#2E86AB] bg-[#2E86AB] text-white'
+                          : 'border-[#E8E8E4] bg-white text-[#6B7280] hover:border-[#2E86AB]/40'
                       }`}
                     >
                       <span className="text-lg">{opt.icon}</span>
@@ -296,11 +296,11 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
 
               {/* ── Notes ── */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-gray-700 font-body">
+                <label className="text-sm font-semibold text-[#1A1A2E] font-body">
                   {t('cart.notesLabel')}
                 </label>
                 <textarea
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 font-body text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral resize-none"
+                  className="w-full rounded-[10px] border border-[#E8E8E4] px-4 py-3 font-body text-sm placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] resize-none"
                   rows={2}
                   placeholder={t('cart.notesPlaceholder')}
                   value={notes}
@@ -315,12 +315,22 @@ export function CartDrawer({ open, onClose }: CartDrawerProps) {
         {/* ── Confirm button ── */}
         {items.length > 0 && (
           <div
-            className="shrink-0 px-5 pt-3 pb-5 border-t border-gray-100 bg-white"
+            className="shrink-0 px-5 pt-3 pb-5 border-t border-[#E8E8E4] bg-white"
             style={{ paddingBottom: 'max(20px, env(safe-area-inset-bottom))' }}
           >
-            <Button fullWidth size="lg" loading={placing} onClick={handlePlaceOrder}>
+            <button
+              onClick={handlePlaceOrder}
+              disabled={placing}
+              className="w-full h-[52px] bg-[#2E86AB] text-white font-semibold rounded-xl hover:bg-[#2E86AB]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {placing && (
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+              )}
               {t('cart.placeOrder')} {total.toFixed(2).replace('.', ',')}
-            </Button>
+            </button>
           </div>
         )}
       </div>

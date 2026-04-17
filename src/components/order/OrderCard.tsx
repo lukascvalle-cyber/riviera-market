@@ -18,6 +18,8 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, on
   const { t } = useTranslation()
   const createdAt = new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
+  const isActive = !['delivered', 'cancelled'].includes(order.status)
+
   const VENDOR_ACTIONS: Partial<Record<OrderStatus, { label: string; next: OrderStatus }>> = {
     pending: { label: t('orders.confirm'), next: 'confirmed' },
     confirmed: { label: t('orders.onTheWay'), next: 'delivering' },
@@ -27,18 +29,24 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, on
   const action = role === 'vendedor' ? VENDOR_ACTIONS[order.status] : null
 
   return (
-    <div className="bg-white rounded-2xl border border-sand-200 p-4 flex flex-col gap-3">
+    <div
+      className="bg-white rounded-2xl border border-[#E8E8E4] p-4 flex flex-col gap-3"
+      style={{
+        boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+        borderLeft: isActive && role === 'vendedor' ? '4px solid #2E86AB' : undefined,
+      }}
+    >
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
             {order.vendor?.category && (
               <span className="text-lg">{CATEGORY_EMOJI[order.vendor.category]}</span>
             )}
-            <p className="font-semibold font-body text-gray-900">
+            <p className="font-semibold font-body text-[#1A1A2E]">
               {order.vendor?.display_name ?? t('nav.orders')}
             </p>
           </div>
-          <p className="text-xs text-gray-400 font-body mt-0.5">{createdAt}</p>
+          <p className="text-xs text-[#6B7280] font-body mt-0.5">{createdAt}</p>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
@@ -46,21 +54,21 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, on
       {order.order_items && order.order_items.length > 0 && (
         <ul className="flex flex-col gap-1">
           {order.order_items.map(item => (
-            <li key={item.id} className="flex justify-between text-sm font-body text-gray-700">
+            <li key={item.id} className="flex justify-between text-sm font-body text-[#6B7280]">
               <span>{item.quantity}× {item.product_name}</span>
-              <span className="text-gray-500">R$ {(item.unit_price * item.quantity).toFixed(2).replace('.', ',')}</span>
+              <span>R$ {(item.unit_price * item.quantity).toFixed(2).replace('.', ',')}</span>
             </li>
           ))}
         </ul>
       )}
 
-      <div className="flex items-center justify-between border-t border-sand-100 pt-2">
+      <div className="flex items-center justify-between border-t border-[#E8E8E4] pt-2">
         <div>
-          <p className="font-display font-bold text-coral">
+          <p className="font-display font-bold text-[#2E86AB]">
             R$ {order.total_brl.toFixed(2).replace('.', ',')}
           </p>
           {order.delivery_location && (
-            <p className="text-xs text-gray-500 font-body mt-0.5">📍 {order.delivery_location}</p>
+            <p className="text-xs text-[#6B7280] font-body mt-0.5">📍 {order.delivery_location}</p>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -68,12 +76,12 @@ export function OrderCard({ order, role, onUpdateStatus, onTrack, onNavigate, on
           {['pending', 'confirmed', 'delivering'].includes(order.status) && onOpenChat && (
             <button
               onClick={() => onOpenChat(order.id)}
-              className="relative w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors text-gray-600 shrink-0"
+              className="relative w-10 h-10 rounded-full bg-[#F5E6D3]/60 flex items-center justify-center hover:bg-[#F5E6D3] transition-colors text-[#6B7280] shrink-0"
               aria-label="Abrir chat"
             >
               💬
               {(unreadCount ?? 0) > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
+                <span className="absolute -top-1 -right-1 bg-[#E63946] text-white text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1">
                   {(unreadCount ?? 0) > 9 ? '9+' : unreadCount}
                 </span>
               )}

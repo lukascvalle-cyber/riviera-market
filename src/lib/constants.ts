@@ -10,7 +10,7 @@ export const BEACH_ZOOM = 15
 export const BEACH_MAX_ZOOM = 18
 export const BEACH_MIN_ZOOM = 13
 
-export const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12'
+export const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11'
 
 export const CATEGORY_LABELS: Record<VendorCategory, string> = {
   bebidas: 'Bebidas',
@@ -48,11 +48,11 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
 }
 
 export const ORDER_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  confirmed: 'bg-blue-100 text-blue-800',
-  delivering: 'bg-ocean-100 text-ocean-500',
-  delivered: 'bg-green-100 text-green-800',
-  cancelled: 'bg-red-100 text-red-800',
+  pending: 'bg-[#F5E6D3] text-[#2E86AB]',
+  confirmed: 'bg-[#2E86AB] text-white',
+  delivering: 'bg-[#52B788] text-white',
+  delivered: 'bg-[#E8E8E4] text-[#6B7280]',
+  cancelled: 'bg-red-100 text-[#E63946]',
 }
 
 export const GPS_INTERVAL_MS = 5_000

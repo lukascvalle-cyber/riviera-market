@@ -8,9 +8,9 @@ import { useToast } from '../../components/ui/Toast'
 import type { VendorApplication, VendorApplicationStatus } from '../../types'
 
 const STATUS_BADGE: Record<VendorApplicationStatus, string> = {
-  pending: 'bg-yellow-100 text-yellow-800',
-  approved: 'bg-green-100 text-green-800',
-  rejected: 'bg-red-100 text-red-800',
+  pending: 'bg-[#F5E6D3] text-[#2E86AB]',
+  approved: 'bg-[#52B788]/15 text-[#52B788]',
+  rejected: 'bg-red-100 text-[#E63946]',
 }
 
 
@@ -30,11 +30,11 @@ function RejectModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-4">
-        <h3 className="font-display text-lg font-semibold text-gray-900">
+        <h3 className="font-display text-lg font-semibold text-[#1A1A2E]">
           {t('admin.rejectAction')}
         </h3>
         <div className="flex flex-col gap-1">
-          <label className="text-sm font-semibold text-gray-700 font-body">
+          <label className="text-sm font-semibold text-[#1A1A2E] font-body">
             {t('admin.rejectReason')}
           </label>
           <textarea
@@ -42,13 +42,13 @@ function RejectModal({
             value={reason}
             onChange={e => setReason(e.target.value)}
             placeholder={t('admin.rejectReasonPlaceholder')}
-            className="w-full rounded-xl border border-gray-200 px-4 py-2.5 font-body text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-coral resize-none"
+            className="w-full rounded-[10px] border border-[#E8E8E4] px-4 py-2.5 font-body text-sm text-[#1A1A2E] placeholder-[#6B7280] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] resize-none"
           />
         </div>
         <div className="flex gap-2 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded-xl font-body text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 rounded-xl font-body text-sm font-semibold text-[#6B7280] hover:bg-[#FAFAF8] transition-colors"
           >
             {t('common.cancel')}
           </button>
@@ -86,21 +86,20 @@ function ApplicationCard({
   })
 
   return (
-    <div className="bg-white rounded-2xl border border-sand-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-[#E8E8E4] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.06)' }}>
       {/* Header row */}
       <button
         type="button"
         onClick={() => setExpanded(v => !v)}
-        className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-sand-50 transition-colors"
+        className="w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-[#FAFAF8] transition-colors"
       >
-        {/* Photo placeholder */}
-        <div className="w-11 h-11 rounded-xl bg-sand-100 flex items-center justify-center text-xl shrink-0">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0" style={{ backgroundColor: '#F5E6D3' }}>
           🙋
         </div>
 
         <div className="flex-1 min-w-0">
-          <p className="font-display font-semibold text-gray-900 truncate">{app.full_name}</p>
-          <p className="text-xs text-gray-500 font-body truncate">{app.email} · {createdAt}</p>
+          <p className="font-display font-semibold text-[#1A1A2E] truncate">{app.full_name}</p>
+          <p className="text-xs text-[#6B7280] font-body truncate">{app.email} · {createdAt}</p>
         </div>
 
         <Badge className={STATUS_BADGE[app.status]}>
@@ -108,7 +107,7 @@ function ApplicationCard({
         </Badge>
 
         <svg
-          className={`w-4 h-4 text-gray-400 shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-[#6B7280] shrink-0 transition-transform ${expanded ? 'rotate-180' : ''}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
@@ -117,27 +116,27 @@ function ApplicationCard({
 
       {/* Expanded details */}
       {expanded && (
-        <div className="border-t border-sand-100 px-4 pb-5 pt-4 flex flex-col gap-4">
+        <div className="border-t border-[#E8E8E4] px-4 pb-5 pt-4 flex flex-col gap-4">
 
           {/* Grid of info fields */}
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <div>
-              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.cpf')}</p>
-              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">{app.cpf}</p>
+              <p className="text-xs text-[#6B7280] font-body uppercase tracking-wide">{t('admin.cpf')}</p>
+              <p className="font-body text-sm font-semibold text-[#1A1A2E] mt-0.5">{app.cpf}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.phone')}</p>
-              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">{app.phone}</p>
+              <p className="text-xs text-[#6B7280] font-body uppercase tracking-wide">{t('admin.phone')}</p>
+              <p className="font-body text-sm font-semibold text-[#1A1A2E] mt-0.5">{app.phone}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.vendorType')}</p>
-              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">
+              <p className="text-xs text-[#6B7280] font-body uppercase tracking-wide">{t('admin.vendorType')}</p>
+              <p className="font-body text-sm font-semibold text-[#1A1A2E] mt-0.5">
                 {t(`vendorRegister.${app.vendor_type}`)}
               </p>
             </div>
             <div>
-              <p className="text-xs text-gray-400 font-body uppercase tracking-wide">{t('admin.modules')}</p>
-              <p className="font-body text-sm font-semibold text-gray-800 mt-0.5">
+              <p className="text-xs text-[#6B7280] font-body uppercase tracking-wide">{t('admin.modules')}</p>
+              <p className="font-body text-sm font-semibold text-[#1A1A2E] mt-0.5">
                 {app.modules.slice().sort((a, b) => Number(a) - Number(b)).join(', ')}
               </p>
             </div>
@@ -145,10 +144,10 @@ function ApplicationCard({
 
           {/* Products description */}
           <div>
-            <p className="text-xs text-gray-400 font-body uppercase tracking-wide mb-1">
+            <p className="text-xs text-[#6B7280] font-body uppercase tracking-wide mb-1">
               {t('vendorRegister.productsDescription')}
             </p>
-            <p className="font-body text-sm text-gray-700 leading-relaxed">{app.product_description}</p>
+            <p className="font-body text-sm text-[#1A1A2E] leading-relaxed">{app.product_description}</p>
           </div>
 
           {/* Actions */}
@@ -258,28 +257,28 @@ export function VendorApplicationsPage() {
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold text-gray-900">{t('admin.applicationsTitle')}</h1>
-        <p className="font-body text-sm text-gray-500 mt-1">{t('admin.applicationsSubtitle')}</p>
+        <h1 className="font-display text-3xl font-bold text-[#1A1A2E]">{t('admin.applicationsTitle')}</h1>
+        <p className="font-body text-sm text-[#6B7280] mt-1">{t('admin.applicationsSubtitle')}</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-sand-100 rounded-xl p-1 mb-5">
+      <div className="flex gap-1 rounded-xl p-1 mb-5" style={{ backgroundColor: 'rgba(245,230,211,0.4)' }}>
         {(['pending', 'approved', 'rejected'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`flex-1 py-2 rounded-lg font-body text-sm font-semibold transition-colors flex items-center justify-center gap-1.5 ${
               activeTab === tab
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white text-[#1A1A2E] shadow-sm'
+                : 'text-[#6B7280] hover:text-[#1A1A2E]'
             }`}
           >
             {t(`admin.tab_${tab}`)}
             {counts[tab] > 0 && (
               <span className={`text-xs rounded-full px-1.5 py-0.5 font-bold ${
-                tab === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                tab === 'approved' ? 'bg-green-100 text-green-700' :
-                'bg-red-100 text-red-700'
+                tab === 'pending' ? 'bg-[#F5E6D3] text-[#2E86AB]' :
+                tab === 'approved' ? 'bg-[#52B788]/15 text-[#52B788]' :
+                'bg-red-100 text-[#E63946]'
               }`}>
                 {counts[tab]}
               </span>
@@ -294,7 +293,7 @@ export function VendorApplicationsPage() {
       ) : filtered.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-4xl mb-3">📋</p>
-          <p className="text-gray-500 font-body">{t('admin.noApplications')}</p>
+          <p className="text-[#6B7280] font-body">{t('admin.noApplications')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-3">
