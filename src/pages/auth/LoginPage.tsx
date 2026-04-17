@@ -4,11 +4,36 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff } from 'lucide-react'
 import { supabase } from '../../lib/supabase'
-import { Input } from '../../components/ui/Input'
-import { Button } from '../../components/ui/Button'
 import { useAuth } from '../../contexts/AuthContext'
 import { LanguageSelector } from '../../components/ui/LanguageSelector'
+
+function WaveIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 48 48"
+      fill="none"
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M4 28C4 28 8 24 14 24C20 24 22 28 28 28C34 28 36 24 42 24C48 24 48 28 48 28"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4 36C4 36 8 32 14 32C20 32 22 36 28 36C34 36 36 32 42 32C48 32 48 36 48 36"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        opacity="0.6"
+      />
+      <circle cx="24" cy="14" r="6" fill="currentColor" opacity="0.3" />
+    </svg>
+  )
+}
 
 type FormValues = { email: string; password: string }
 
@@ -18,6 +43,7 @@ export function LoginPage() {
   const { t } = useTranslation()
   const [error, setError] = useState<string | null>(null)
   const [loginAttempted, setLoginAttempted] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const schema = z.object({
     email: z.string().email(t('auth.validation.invalidEmail')),
@@ -49,40 +75,92 @@ export function LoginPage() {
   }, [loginAttempted, profile, navigate])
 
   return (
-    <div className="min-h-screen bg-sand flex flex-col items-center justify-center p-4">
+    <main className="min-h-screen bg-background flex items-center justify-center px-6 py-12">
       <div className="w-full max-w-sm">
-        <div className="flex justify-end mb-2">
-          <LanguageSelector />
-        </div>
-        <div className="text-center mb-8">
-          <h1 className="font-display text-4xl font-bold text-coral">Riviera</h1>
-          <p className="font-display text-xl text-ocean mt-1">Market</p>
-          <p className="text-gray-500 font-body text-sm mt-3">{t('auth.subtitle')}</p>
-        </div>
-
-        <div className="bg-white rounded-3xl shadow-sm border border-sand-200 p-6">
-          <h2 className="font-display text-2xl font-semibold text-gray-900 mb-5">{t('auth.login.title')}</h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-            <Input label={t('auth.login.email')} type="email" autoComplete="email" {...register('email')} error={errors.email?.message} />
-            <Input label={t('auth.login.password')} type="password" autoComplete="current-password" {...register('password')} error={errors.password?.message} />
-            {error && <p className="text-sm text-red-600 font-body bg-red-50 rounded-xl p-3">{error}</p>}
-            <Button type="submit" fullWidth size="lg" loading={isSubmitting} className="mt-2">
-              {t('auth.login.submit')}
-            </Button>
-          </form>
-          <p className="text-center text-sm text-gray-500 font-body mt-5">
-            {t('auth.login.noAccount')}{' '}
-            <Link to="/register" className="text-coral font-semibold hover:underline">{t('auth.login.createAccount')}</Link>
+        {/* Logo & Branding */}
+        <div className="text-center mb-10">
+          <WaveIcon className="w-12 h-12 text-primary mx-auto mb-4" />
+          <h1 className="text-2xl font-semibold text-primary tracking-tight">
+            Riviera Market
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1.5">
+            {t('auth.subtitle')}
           </p>
         </div>
 
-        {/* Discreet vendor registration link */}
-        <p className="text-center text-xs text-gray-400 font-body mt-5">
-          <Link to="/cadastro-vendedor" className="hover:text-gray-600 transition-colors">
+        {/* Login Form */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <div>
+            <input
+              type="email"
+              placeholder={t('auth.login.email')}
+              autoComplete="email"
+              {...register('email')}
+              className="w-full h-12 px-4 rounded-[10px] border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+            />
+            {errors.email && (
+              <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
+            )}
+          </div>
+
+          <div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                placeholder={t('auth.login.password')}
+                autoComplete="current-password"
+                {...register('password')}
+                className="w-full h-12 px-4 pr-12 rounded-[10px] border border-input bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
+            {errors.password && (
+              <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
+            )}
+          </div>
+
+          {error && (
+            <p className="text-sm text-red-600 bg-red-50 rounded-xl p-3">{error}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full h-[52px] bg-primary text-primary-foreground font-semibold rounded-xl hover:bg-primary/90 transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? '...' : t('auth.login.submit')}
+          </button>
+        </form>
+
+        {/* Divider */}
+        <div className="flex items-center gap-4 my-6">
+          <div className="flex-1 h-px bg-border" />
+          <span className="text-muted-foreground text-sm">ou</span>
+          <div className="flex-1 h-px bg-border" />
+        </div>
+
+        {/* Vendor registration link */}
+        <div className="text-center">
+          <Link
+            to="/cadastro-vendedor"
+            className="text-primary text-sm font-medium hover:underline underline-offset-2 transition-all"
+          >
             {t('auth.login.vendorRegisterLink')}
           </Link>
-        </p>
+        </div>
+
+        {/* Language Selector */}
+        <div className="flex items-center justify-center mt-10">
+          <LanguageSelector />
+        </div>
       </div>
-    </div>
+    </main>
   )
 }
