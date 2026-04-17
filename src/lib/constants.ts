@@ -10,7 +10,7 @@ export const BEACH_ZOOM = 15
 export const BEACH_MAX_ZOOM = 18
 export const BEACH_MIN_ZOOM = 13
 
-export const MAPBOX_STYLE = 'mapbox://styles/mapbox/light-v11'
+export const MAPBOX_STYLE = 'mapbox://styles/mapbox/satellite-streets-v12'
 
 export const CATEGORY_LABELS: Record<VendorCategory, string> = {
   bebidas: 'Bebidas',
