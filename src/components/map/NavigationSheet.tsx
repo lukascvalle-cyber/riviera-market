@@ -5,10 +5,7 @@ import { haversineDistance } from '../../lib/utils'
 import { Button } from '../ui/Button'
 import type { Order } from '../../types'
 
-// SIMULATION: remove when real buyer GPS is active
-const SIMULATED_BUYER_LOCATION: [number, number] = [-46.00405736577133, -23.79828486994515]
-
-// SIMULATION: remove when real vendor GPS is used exclusively
+// Fallback when vendor has no GPS row yet
 const SIMULATED_VENDOR_LOCATION: [number, number] = [-46.013242134647186, -23.80107764839738]
 
 // Marching-ants dash sequence for the route line
@@ -42,9 +39,7 @@ export function NavigationSheet({
   const [visible, setVisible] = useState(false)
   // [lng, lat] — null while loading
   const [vendorCoords, setVendorCoords] = useState<[number, number] | null>(null)
-
-  // SIMULATION: buyer coords are hardcoded; replace with order.buyer_location when available
-  const buyerCoords: [number, number] = SIMULATED_BUYER_LOCATION
+  const [buyerCoords, setBuyerCoords] = useState<[number, number] | null>(null)
 
   // Slide-up animation
   useEffect(() => {
@@ -63,15 +58,30 @@ export function NavigationSheet({
         if (data) {
           setVendorCoords([data.longitude, data.latitude])
         } else {
-          // SIMULATION: fall back to simulated coords when no real GPS row exists
           setVendorCoords(SIMULATED_VENDOR_LOCATION)
         }
       })
   }, [vendorId])
 
-  // Build map once vendor coords are available
+  // Fetch buyer's saved location from profiles using the order's buyer_id
   useEffect(() => {
-    if (!containerRef.current || !vendorCoords) return
+    if (!order.buyer_id) return
+    supabase
+      .from('profiles')
+      .select('latitude, longitude')
+      .eq('id', order.buyer_id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const d = data as { latitude: number | null; longitude: number | null } | null
+        if (d?.latitude != null && d?.longitude != null) {
+          setBuyerCoords([d.longitude, d.latitude])
+        }
+      })
+  }, [order.buyer_id])
+
+  // Build map once both vendor and buyer coords are available
+  useEffect(() => {
+    if (!containerRef.current || !vendorCoords || !buyerCoords) return
 
     mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN
 
@@ -188,12 +198,11 @@ export function NavigationSheet({
       map.remove()
       mapInstanceRef.current = null
     }
-    // buyerCoords is stable (constant), vendorCoords drives the effect
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vendorCoords])
+  }, [vendorCoords, buyerCoords])
 
   // ── ETA / distance ──
-  const distanceM = vendorCoords
+  const distanceM = vendorCoords && buyerCoords
     ? Math.round(haversineDistance(vendorCoords[1], vendorCoords[0], buyerCoords[1], buyerCoords[0]))
     : null
   // Walking speed: 4 km/h → 1 min per 66.67 m
@@ -262,7 +271,7 @@ export function NavigationSheet({
 
         {/* Map — fills remaining space */}
         <div ref={containerRef} className="flex-1 relative">
-          {!vendorCoords && (
+          {(!vendorCoords || !buyerCoords) && (
             <div className="absolute inset-0 flex items-center justify-center z-10" style={{ backgroundColor: '#FAFAF8' }}>
               <p className="text-[#6B7280] font-body text-sm">Obtendo localização…</p>
             </div>

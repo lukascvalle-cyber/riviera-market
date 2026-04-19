@@ -4,8 +4,7 @@ import { supabase } from '../../lib/supabase'
 import { haversineDistance } from '../../lib/utils'
 import type { Order } from '../../types'
 
-// SIMULATION: fallback when no real GPS row exists
-const SIMULATED_BUYER_LOCATION: [number, number] = [-46.00405736577133, -23.79828486994515]
+// Fallback when vendor has no GPS row yet
 const SIMULATED_VENDOR_LOCATION: [number, number] = [-46.013242134647186, -23.80107764839738]
 
 // Marching-ants dash sequence — identical to NavigationSheet
@@ -49,23 +48,21 @@ export function BuyerTrackingSheet({
     }
   }, [open])
 
-  // Fetch buyer location from profiles table
+  // Fetch buyer location from profiles using the order's buyer_id
   useEffect(() => {
-    if (!open) return
+    if (!open || !order.buyer_id) return
     supabase
       .from('profiles')
       .select('latitude, longitude')
-      .eq('id', currentUserId)
+      .eq('id', order.buyer_id)
       .maybeSingle()
       .then(({ data }) => {
         const d = data as { latitude: number | null; longitude: number | null } | null
         if (d?.latitude != null && d?.longitude != null) {
           setBuyerCoords([d.longitude, d.latitude])
-        } else {
-          setBuyerCoords(SIMULATED_BUYER_LOCATION)
         }
       })
-  }, [open, currentUserId])
+  }, [open, order.buyer_id])
 
   // Fetch vendor location, then poll every 5 s for live updates
   useEffect(() => {

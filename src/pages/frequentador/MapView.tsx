@@ -24,8 +24,6 @@ const SIMULATED_VENDOR_LOCATION: Record<string, [number, number]> = {
   // SIMULATION: remove this entire constant when real-time location is active
 }
 
-// SIMULATION: remove when real buyer GPS is active
-const SIMULATED_BUYER_LOCATION: [number, number] = [-46.00405736577133, -23.79828486994515]
 
 /* ── Product card ── */
 function ProductCard({ product }: { product: Product }) {
@@ -132,8 +130,8 @@ export function MapView() {
   const [proximityAlert, setProximityAlert] = useState(false)
   const alertedOrdersRef = useRef<Set<string>>(new Set())
 
-  // Buyer location from profiles table (falls back to simulation if not set)
-  const [buyerCoords, setBuyerCoords] = useState<[number, number]>(SIMULATED_BUYER_LOCATION)
+  // Buyer location — populated from GPS once permission is granted
+  const [buyerCoords, setBuyerCoords] = useState<[number, number] | null>(null)
 
   // Location permission state: 'checking' | 'prompt' | 'granted' | 'denied' | 'dismissed'
   const [locationPermission, setLocationPermission] = useState<'checking' | 'prompt' | 'granted' | 'denied' | 'dismissed'>('checking')
@@ -207,7 +205,7 @@ export function MapView() {
 
   // Buyer marker — updates position when real coords arrive
   useEffect(() => {
-    if (!map) return
+    if (!map || !buyerCoords) return
     const el = document.createElement('div')
     el.style.cssText = `
       width: 36px; height: 36px; border-radius: 50%;
@@ -266,6 +264,7 @@ export function MapView() {
 
   // ── Proximity alert: check on every vendor location update ──
   useEffect(() => {
+    if (!buyerCoords) return
     const activeDeliveries = orders.filter(o =>
       ['confirmed', 'delivering'].includes(o.status),
     )
@@ -277,8 +276,8 @@ export function MapView() {
       const dist = haversineDistance(
         vendor.location.latitude,
         vendor.location.longitude,
-        buyerCoords[1], // lat
-        buyerCoords[0], // lng
+        buyerCoords[1],
+        buyerCoords[0],
       )
 
       if (dist <= 50) {
@@ -334,7 +333,7 @@ export function MapView() {
   const sortedVendors = useMemo(() => {
     return [...allVendors]
       .map(vendor => {
-        const dist = vendor.location
+        const dist = vendor.location && buyerCoords
           ? haversineDistance(vendor.location.latitude, vendor.location.longitude, buyerCoords[1], buyerCoords[0])
           : null
         return { vendor, dist }
