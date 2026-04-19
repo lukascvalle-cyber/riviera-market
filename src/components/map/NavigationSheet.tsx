@@ -65,11 +65,11 @@ export function NavigationSheet({
 
   // Fetch buyer's saved location from profiles using the order's buyer_id
   useEffect(() => {
-    if (!order.buyer_id) return
+    if (!order.frequentador_id) return
     supabase
       .from('profiles')
       .select('latitude, longitude')
-      .eq('id', order.buyer_id)
+      .eq('id', order.frequentador_id)
       .maybeSingle()
       .then(({ data }) => {
         const d = data as { latitude: number | null; longitude: number | null } | null
@@ -77,7 +77,7 @@ export function NavigationSheet({
           setBuyerCoords([d.longitude, d.latitude])
         }
       })
-  }, [order.buyer_id])
+  }, [order.frequentador_id])
 
   // Build map once both vendor and buyer coords are available
   useEffect(() => {

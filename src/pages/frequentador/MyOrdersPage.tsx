@@ -147,12 +147,11 @@ export function MyOrdersPage() {
         />
       )}
 
-      {trackingOrder && user && (
+      {trackingOrder && (
         <BuyerTrackingSheet
           open={trackingOrder !== null}
           onClose={() => setTrackingOrder(null)}
           order={trackingOrder}
-          currentUserId={user.id}
         />
       )}
 

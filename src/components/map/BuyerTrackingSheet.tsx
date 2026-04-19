@@ -20,14 +20,12 @@ interface BuyerTrackingSheetProps {
   open: boolean
   onClose: () => void
   order: Order
-  currentUserId: string
 }
 
 export function BuyerTrackingSheet({
   open,
   onClose,
   order,
-  currentUserId,
 }: BuyerTrackingSheetProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
@@ -50,11 +48,11 @@ export function BuyerTrackingSheet({
 
   // Fetch buyer location from profiles using the order's buyer_id
   useEffect(() => {
-    if (!open || !order.buyer_id) return
+    if (!open || !order.frequentador_id) return
     supabase
       .from('profiles')
       .select('latitude, longitude')
-      .eq('id', order.buyer_id)
+      .eq('id', order.frequentador_id)
       .maybeSingle()
       .then(({ data }) => {
         const d = data as { latitude: number | null; longitude: number | null } | null
@@ -62,7 +60,7 @@ export function BuyerTrackingSheet({
           setBuyerCoords([d.longitude, d.latitude])
         }
       })
-  }, [open, order.buyer_id])
+  }, [open, order.frequentador_id])
 
   // Fetch vendor location, then poll every 5 s for live updates
   useEffect(() => {
